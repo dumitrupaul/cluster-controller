@@ -1,6 +1,7 @@
 #include "TcpConnection.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
+//#include "boost/log/trivial.hpp"
 
 #define MAX_MESSAGE_SIZE 1024
 
@@ -35,7 +36,7 @@ namespace ClusterController
         if (!error)
         {
             m_rxBuffer.resize(bytes_transferred);
-            std::cout << "Am citit: " << m_rxBuffer << std::endl;
+           // BOOST_LOG_TRIVIAL(info) << "Read from: " << m_rxBuffer;
         }
         else if (error == boost::asio::error::eof)
         {
