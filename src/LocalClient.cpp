@@ -1,25 +1,33 @@
 #include "LocalClient.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
+#include "DeviceManager.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace ClusterController
 {
 
     LocalClient::LocalClient(boost::asio::io_service &io_service, int serverPort) : 
                             m_serverPort(serverPort), 
-                            m_socket(io_service)
+                            m_socket(io_service),
+                            connectionTimer(io_service)
     {
+        startConnection();
+    }
+
+    void LocalClient::connectionTimerExpired()
+    {
+        std::cout << "Coldn't connect in time. Make sure batman-adv is properly configured "
+                     "and the device is connected to the mesh" << std::endl;
+        
         startConnection();
     }
 
     void LocalClient::startConnection()
     {  
-        std::cout << "IP ADRESS:";
-        std::cin >> m_ipAddress;
-        std::cout << "ENTER MESSAGE: ";
-        std::cin >> m_txBuffer;
+        handleInput();
 
-        tcp::endpoint endPoint(boost::asio::ip::address::from_string(m_ipAddress), m_serverPort);
+        tcp::endpoint endPoint(m_ipAddress, m_serverPort);
         m_socket.async_connect(endPoint, boost::bind(&LocalClient::onConnect, this, boost::asio::placeholders::error));
     }
 
@@ -28,18 +36,21 @@ namespace ClusterController
         if (!error)
         {
             //connection succeeded
-            handleMessages();
+            writeMessage();
         }
         else
         {
             if(error == boost::asio::error::connection_aborted) std::cout << "Device disconnected: ";
+            if(error == boost::asio::error::host_unreachable)
+                std::cout << "Couldn't connect in time. Make sure batman-adv is properly configured "
+                                "and the device is connected to the mesh: " << std::endl;
             std::cout << error.message() << std::endl;
             m_socket.close();
             startConnection();
         }
     }
 
-    void LocalClient::handleMessages()
+    void LocalClient::writeMessage()
     {
         boost::asio::async_write(m_socket, boost::asio::buffer(m_txBuffer),
                                 boost::bind(&LocalClient::onWrite, this,
@@ -61,5 +72,23 @@ namespace ClusterController
         //close the socket after every message sent
         m_socket.close();
         startConnection();
+    }
+
+    void LocalClient::handleInput()
+    {
+        using namespace std;
+
+        vector<string> names(DeviceManager::getInstance()->getNames());
+        string selectedName;
+        cout << endl << "Select a device from the list:" << endl;
+        for (vector<string>::const_iterator i = names.begin(); i != names.end(); ++i)
+        {
+            cout << *i << endl;
+        }
+
+        cin >> selectedName;
+        m_ipAddress = DeviceManager::getInstance()->getIPfromName(selectedName);
+        cout << "ENTER MESSAGE: ";
+        cin >> m_txBuffer;
     }
 }

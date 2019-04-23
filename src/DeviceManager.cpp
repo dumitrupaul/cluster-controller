@@ -55,7 +55,7 @@ namespace ClusterController
             BOOST_LOG_TRIVIAL(fatal) << "Cannot parse devices: DeviceManager.xml";
             return true;
         }
-
+        std::cout << "Reading XML configuration file...";
         for(rapidxml::xml_node<> *pNode = cRoot->first_node(); pNode; pNode = pNode->next_sibling())
         {
             std::string name(pNode->first_attribute("name")->value());
@@ -63,20 +63,50 @@ namespace ClusterController
             Features feature;
             for(rapidxml::xml_node<> *qNode = pNode->first_node(); qNode; qNode = qNode->next_sibling())
             {
-                if(std::string(pNode->first_node()->name()).compare("led") == 0)
+                if(std::string(qNode->name()).compare("led") == 0)
                 {
                     feature.insertLed(qNode->first_attribute("pin")->value());
                 }
-                if(std::string(pNode->first_node()->name()).compare("button") == 0)
+                if(std::string(qNode->name()).compare("button") == 0)
                 {
-                    feature.insertButton(qNode->first_attribute("pin")->value());
+                    feature.insertButton(qNode->first_attribute("pin")->value(), 
+                                         qNode->first_node("connection")->value(),
+                                         qNode->last_node()->name());
+
                 }
             }
 
             m_devicesMap.insert(std::make_pair(name, td_device(boost::asio::ip::address::from_string(ipAddress), feature)));
         }
-
+        std::cout << "..............Done." << std::endl;
+        printDeviceMap();
         return false;
+    }
+
+    void DeviceManager::printDeviceMap()
+    {
+        for(std::map<std::string,td_device>::iterator it = m_devicesMap.begin(); it != m_devicesMap.end(); ++it) 
+        {
+            std::cout << it->first <<" : " << it->second.first.to_string() << std::endl;
+            it->second.second.printFeatures();
+        }
+    }
+
+    std::vector<std::string> DeviceManager::getNames()
+    {
+        std::vector<std::string> names;
+
+        for(std::map<std::string,td_device>::iterator it = m_devicesMap.begin(); it != m_devicesMap.end(); ++it) 
+        {
+            names.push_back(it->first);
+        }
+
+        return names;
+    }
+
+    boost::asio::ip::address DeviceManager::getIPfromName(std::string& name)
+    {
+        return m_devicesMap[name].first;
     }
 
     DeviceManager::~DeviceManager()

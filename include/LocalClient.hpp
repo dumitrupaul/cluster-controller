@@ -17,14 +17,19 @@ namespace ClusterController
     private:
         void onConnect(const boost::system::error_code &error);
 
-        void handleMessages();
+        void writeMessage();
+
+        void handleInput();
 
         void onWrite(const boost::system::error_code &error, size_t bytes_transferred);
+
+        void connectionTimerExpired();
         
         int m_serverPort;
         tcp::socket m_socket;
         std::string m_txBuffer;
-        std::string m_ipAddress;
+        boost::asio::deadline_timer connectionTimer;
+        boost::asio::ip::address m_ipAddress;
     };
 }
 #endif //LOCALCLIENT_HPP

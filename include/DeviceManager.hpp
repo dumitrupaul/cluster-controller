@@ -2,46 +2,25 @@
 #define DEVICEMANAGER_HPP
 #include <map>
 #include <boost/asio.hpp>
+#include "Features.h"
 
 namespace ClusterController
 {
-    struct Led
-    {
-        Led(char* pin):pinNumber(atoi(pin)){}
-        int pinNumber;
-    };
-    
-    struct Button
-    {
-        Button(char* pin):pinNumber(atoi(pin)){}
-        int pinNumber;
-    };
-
-    class Features
-    {
-        public:
-            void insertLed(char* value)
-            {
-                return ledList.push_back(Led(value));
-            }
-            void insertButton(char* value)
-            {
-                return buttonList.push_back(Button(value));
-            }
-
-        private:
-            std::vector<Button> buttonList;
-            std::vector<Led> ledList;
-
-    };
     typedef std::pair<boost::asio::ip::address, Features> td_device;
     class DeviceManager
     {
         public:
             static DeviceManager* getInstance();
+
             bool loadDevices();
 
+            std::vector<std::string> getNames();
+
+            boost::asio::ip::address getIPfromName(std::string& name);
+
         private:
+            void printDeviceMap();
+            
             DeviceManager();
 
             ~DeviceManager();

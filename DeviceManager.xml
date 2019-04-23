@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DeviceManager>
     <devices>
-        <device name="PiNode1" ip="172.27.0.1">
+        <device name="pinode1" ip="172.27.0.1">
+            <button pin="2">
+                <connection>172.27.0.2</connection>
+                <onPressSend>MSG_PING</onPressSend>
+            </button>
         </device>
-        <device name="PiNode2" ip="172.27.0.2">
-        <led pin="17">
-        </led>
+        <device name="pinode2" ip="172.27.0.2">
+            <led pin="17"/>
         </device>
-        <device name="UbuntuNode" ip="172.27.0.3">
+        <device name="ubuntunode" ip="172.27.0.3">
         </device>
     </devices>
 </DeviceManager>
