@@ -1,1 +1,6 @@
-[2019-Apr-22 12:50:45.612819][info]:  Read from: paul
+[2019-Apr-22 15:01:38.721506][info]:  Connected to: 172.27.0.2:45594
+[2019-Apr-22 15:01:38.722562][info]:  Read message: salutare
+[2019-Apr-22 15:01:56.760014][info]:  Connected to: 172.27.0.2:45596
+[2019-Apr-22 15:01:56.760670][info]:  Read message: da
+[2019-Apr-22 15:03:09.078708][info]:  Connected to: 172.27.0.2:45598
+[2019-Apr-22 15:03:09.079150][info]:  Read message: test

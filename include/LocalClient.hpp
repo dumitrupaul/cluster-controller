@@ -24,6 +24,7 @@ namespace ClusterController
         int m_serverPort;
         tcp::socket m_socket;
         std::string m_txBuffer;
+        std::string m_ipAddress;
     };
 }
 #endif //LOCALCLIENT_HPP

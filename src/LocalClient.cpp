@@ -13,13 +13,13 @@ namespace ClusterController
     }
 
     void LocalClient::startConnection()
-    {
-        std::string ipAddress;
+    {  
         std::cout << "IP ADRESS:";
-        std::cin >> ipAddress;
+        std::cin >> m_ipAddress;
         std::cout << "ENTER MESSAGE: ";
         std::cin >> m_txBuffer;
-        tcp::endpoint endPoint(boost::asio::ip::address::from_string(ipAddress), m_serverPort);
+
+        tcp::endpoint endPoint(boost::asio::ip::address::from_string(m_ipAddress), m_serverPort);
         m_socket.async_connect(endPoint, boost::bind(&LocalClient::onConnect, this, boost::asio::placeholders::error));
     }
 
@@ -32,7 +32,9 @@ namespace ClusterController
         }
         else
         {
+            if(error == boost::asio::error::connection_aborted) std::cout << "Device disconnected: ";
             std::cout << error.message() << std::endl;
+            m_socket.close();
             startConnection();
         }
     }
@@ -55,6 +57,8 @@ namespace ClusterController
         {
             std::cout << error.message() << std::endl;
         }
+
+        //close the socket after every message sent
         m_socket.close();
         startConnection();
     }

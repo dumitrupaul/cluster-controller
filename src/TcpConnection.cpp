@@ -1,7 +1,8 @@
 #include "TcpConnection.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
-//#include "boost/log/trivial.hpp"
+#include <boost/log/trivial.hpp>
+#include <boost/lexical_cast.hpp>
 
 #define MAX_MESSAGE_SIZE 1024
 
@@ -25,6 +26,7 @@ namespace ClusterController
     void TcpConnection::startServerConnection()
     {
         m_rxBuffer.resize(MAX_MESSAGE_SIZE);
+        BOOST_LOG_TRIVIAL(info) << "Connected to: " << boost::lexical_cast<std::string>(m_socket.remote_endpoint());
         m_socket.async_read_some(boost::asio::buffer(&m_rxBuffer[0], MAX_MESSAGE_SIZE),
                                 boost::bind(&TcpConnection::onRead, shared_from_this(),
                                             boost::asio::placeholders::error,
@@ -36,7 +38,7 @@ namespace ClusterController
         if (!error)
         {
             m_rxBuffer.resize(bytes_transferred);
-           // BOOST_LOG_TRIVIAL(info) << "Read from: " << m_rxBuffer;
+            BOOST_LOG_TRIVIAL(info) << "Read message: " << m_rxBuffer;
         }
         else if (error == boost::asio::error::eof)
         {
@@ -44,8 +46,9 @@ namespace ClusterController
         }
         else
         {
-            std::cout << error.message();
+            BOOST_LOG_TRIVIAL(error) << error.message();
         }
+
         m_socket.close();
     }
 }
