@@ -1,4 +1,3 @@
-#include "TcpConnection.hpp"
 #include "TcpServer.hpp"
 #include "LocalClient.hpp"
 #include "DeviceManager.hpp"

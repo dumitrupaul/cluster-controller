@@ -1,9 +1,9 @@
 #ifndef TCPCONNECTION_HPP
 #define TCPCONNECTION_HPP
+#include "Message.hpp"
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
-#include <string>
 
 
 namespace ClusterController
@@ -11,7 +11,7 @@ namespace ClusterController
     using boost::asio::ip::tcp;
 
     class TcpConnection : public boost::enable_shared_from_this<TcpConnection>,
-                        public boost::noncopyable
+                          public boost::noncopyable
     {
 
     public:
@@ -29,7 +29,8 @@ namespace ClusterController
         void onRead(const boost::system::error_code &error, size_t bytes_transferred);
 
         tcp::socket m_socket;
-        std::string m_rxBuffer;
+        boost::asio::streambuf m_rxBuffer;
+        Message m_recvMsg;
     };
 }
 #endif //TCPCONNECTION_HPP

@@ -19,5 +19,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 clean:
+	rm $(EXE)
 	rm -rf obj/*.o all
 

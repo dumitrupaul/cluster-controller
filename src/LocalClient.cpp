@@ -10,17 +10,8 @@ namespace ClusterController
 
     LocalClient::LocalClient(boost::asio::io_service &io_service, int serverPort) : 
                             m_serverPort(serverPort), 
-                            m_socket(io_service),
-                            connectionTimer(io_service)
+                            m_socket(io_service)
     {
-        startConnection();
-    }
-
-    void LocalClient::connectionTimerExpired()
-    {
-        std::cout << "Coldn't connect in time. Make sure batman-adv is properly configured "
-                     "and the device is connected to the mesh" << std::endl;
-        
         startConnection();
     }
 
@@ -44,7 +35,7 @@ namespace ClusterController
             if(error == boost::asio::error::connection_aborted) std::cout << "Device disconnected: ";
             if(error == boost::asio::error::host_unreachable)
                 std::cout << "Couldn't connect in time. Make sure batman-adv is properly configured "
-                                "and the device is connected to the mesh: " << std::endl;
+                                "and the device is connected to the mesh: ";
             std::cout << error.message() << std::endl;
             m_socket.close();
             startConnection();
@@ -61,10 +52,11 @@ namespace ClusterController
 
     void LocalClient::onWrite(const boost::system::error_code &error, size_t bytes_transferred)
     {
+        //m_txBuffer.consume(bytes_transferred);
+
         if (!error)
         {
-            std::cout << "Message transmitted successfully" << std::endl;
-            m_txBuffer.consume(bytes_transferred);
+            std::cout << "Message transmitted successfully [size:"<< bytes_transferred << "]" << std::endl;
         }
         else
         {
@@ -83,21 +75,28 @@ namespace ClusterController
         //m_txBuffer.clear();
 
         vector<string> names(DeviceManager::getInstance()->getNames());
-        string selectedName;
+        int selectedIdx;
+        int msgType;
+        int printIdx = 0;
         cout << endl << "Select a device from the list:" << endl;
 
-        for (vector<string>::const_iterator i = names.begin(); i != names.end(); ++i)
+        for (vector<string>::const_iterator i = names.begin(); i != names.end(); ++i, ++printIdx)
         {
-            cout << *i << endl;
+            cout << "\t[" << printIdx <<" - " << *i << "]" << endl;
         }
 
-        cin >> selectedName;
-        m_ipAddress = DeviceManager::getInstance()->getIPfromName(selectedName);
-        cout << "ENTER MESSAGE: ";
-        //std::cin >> m_txBuffer;
-        Message msg(e_MSG_PING);
-        if(msg.mouldPacketPayload(m_txBuffer)){
-            return;
+        cin >> selectedIdx;
+        
+        m_ipAddress = DeviceManager::getInstance()->getIPfromName(names[selectedIdx]);
+        cout << endl << "Select the type of message you want to send: \n\t[0 - PING] \n\t[1 - LED]\n";
+        cin >> msgType;
+
+        Message msg(static_cast<MessageType>(msgType));
+
+        if(!msg.mouldMessage(m_txBuffer))
+        {
+            //avoid sending invalid message
+            m_txBuffer.consume(m_txBuffer.size());
         }
 
     }

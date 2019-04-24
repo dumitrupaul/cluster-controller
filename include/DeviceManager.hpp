@@ -16,11 +16,12 @@ namespace ClusterController
 
             std::vector<std::string> getNames();
 
-            boost::asio::ip::address getIPfromName(std::string& name);
+            boost::asio::ip::address getIPfromName(std::string& name) const;
 
             const std::string& getMyIpAddress() const;
 
         private:
+            //useful for debug
             void printDeviceMap();
 
             DeviceManager();

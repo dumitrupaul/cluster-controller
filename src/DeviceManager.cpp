@@ -2,8 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "rapidxml.hpp"
 #include <boost/log/trivial.hpp>
+#include "rapidxml.hpp"
 
 namespace ClusterController
 {
@@ -107,9 +107,9 @@ namespace ClusterController
         return names;
     }
 
-    boost::asio::ip::address DeviceManager::getIPfromName(std::string& name)
+    boost::asio::ip::address DeviceManager::getIPfromName(std::string& name) const
     {
-        return m_devicesMap[name].first;
+        return m_devicesMap.find(name)->second.first;
     }
 
     const std::string& DeviceManager::getMyIpAddress() const

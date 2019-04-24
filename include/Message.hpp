@@ -8,6 +8,8 @@ namespace ClusterController
 {
     using boost::asio::ip::tcp;
 
+    static const uint32_t MAX_MSG_SIZE = 256;
+
     enum MessageType
     {
         e_MSG_PING = 0,
@@ -28,15 +30,16 @@ namespace ClusterController
 
             Message(const Header& header);
 
-            bool mouldPacketPayload(boost::asio::streambuf& m_txBuffer);
+            bool mouldMessage(boost::asio::streambuf& m_txBuffer);
 
-            //boost::asio::const_buffer getMessageBuffer();
+            bool decomposeMessage(boost::asio::streambuf& m_rxBuffer);
 
-        private:
+            MessageType getMessageType();
+
             Message();
 
+        private:
             Header m_header;
-            //boost::asio::streambuf m_txBuffer;
     };
 }
 #endif //MESSAGE_HPP

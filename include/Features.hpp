@@ -1,6 +1,5 @@
 #ifndef FEATURES_HPP
 #define FEATURES_HPP
-#include <string>
 #include <vector>
 #include <boost/asio.hpp>
 
@@ -34,7 +33,7 @@ namespace ClusterController
             void insertLed(char* value);
 
             void insertButton(char* value, char* conn, char* act);
-
+            //useful for debug
             void printFeatures();
 
         private:
