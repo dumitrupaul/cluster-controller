@@ -3,6 +3,7 @@
 #include <iostream>
 #include "DeviceManager.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include "Message.hpp"
 
 namespace ClusterController
 {
@@ -52,7 +53,7 @@ namespace ClusterController
 
     void LocalClient::writeMessage()
     {
-        boost::asio::async_write(m_socket, boost::asio::buffer(m_txBuffer),
+        boost::asio::async_write(m_socket, m_txBuffer.data(),
                                 boost::bind(&LocalClient::onWrite, this,
                                             boost::asio::placeholders::error,
                                             boost::asio::placeholders::bytes_transferred));
@@ -63,6 +64,7 @@ namespace ClusterController
         if (!error)
         {
             std::cout << "Message transmitted successfully" << std::endl;
+            m_txBuffer.consume(bytes_transferred);
         }
         else
         {
@@ -78,9 +80,12 @@ namespace ClusterController
     {
         using namespace std;
 
+        //m_txBuffer.clear();
+
         vector<string> names(DeviceManager::getInstance()->getNames());
         string selectedName;
         cout << endl << "Select a device from the list:" << endl;
+
         for (vector<string>::const_iterator i = names.begin(); i != names.end(); ++i)
         {
             cout << *i << endl;
@@ -89,6 +94,11 @@ namespace ClusterController
         cin >> selectedName;
         m_ipAddress = DeviceManager::getInstance()->getIPfromName(selectedName);
         cout << "ENTER MESSAGE: ";
-        cin >> m_txBuffer;
+        //std::cin >> m_txBuffer;
+        Message msg(e_MSG_PING);
+        if(msg.mouldPacketPayload(m_txBuffer)){
+            return;
+        }
+
     }
 }

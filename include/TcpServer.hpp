@@ -14,6 +14,8 @@ namespace ClusterController
     private:
         void startAccept();
 
+        std::string getIpAddress(); // not functional
+
         void onAccept(TcpConnection::td_tcpConnPointer newConn, const boost::system::error_code &error);
 
         tcp::acceptor serverAcceptor;

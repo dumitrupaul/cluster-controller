@@ -11,6 +11,7 @@
             <led pin="17"/>
         </device>
         <device name="ubuntunode" ip="172.27.0.3">
+            <currentDevice/>
         </device>
     </devices>
 </DeviceManager>

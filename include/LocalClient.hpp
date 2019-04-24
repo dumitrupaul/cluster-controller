@@ -2,6 +2,7 @@
 #define LOCALCLIENT_HPP
 #include <boost/asio.hpp>
 #include <string>
+#include <vector>
 
 namespace ClusterController
 {
@@ -27,7 +28,7 @@ namespace ClusterController
         
         int m_serverPort;
         tcp::socket m_socket;
-        std::string m_txBuffer;
+        boost::asio::streambuf m_txBuffer;
         boost::asio::deadline_timer connectionTimer;
         boost::asio::ip::address m_ipAddress;
     };

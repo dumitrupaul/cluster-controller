@@ -2,7 +2,7 @@
 #define DEVICEMANAGER_HPP
 #include <map>
 #include <boost/asio.hpp>
-#include "Features.h"
+#include "Features.hpp"
 
 namespace ClusterController
 {
@@ -18,14 +18,17 @@ namespace ClusterController
 
             boost::asio::ip::address getIPfromName(std::string& name);
 
+            const std::string& getMyIpAddress() const;
+
         private:
             void printDeviceMap();
-            
+
             DeviceManager();
 
             ~DeviceManager();
 
             static DeviceManager* spInstance;
+            std::string m_myIpAddress;
             std::map<std::string, td_device> m_devicesMap;  
     };
 }

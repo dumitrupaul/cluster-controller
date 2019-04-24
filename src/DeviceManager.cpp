@@ -72,14 +72,17 @@ namespace ClusterController
                     feature.insertButton(qNode->first_attribute("pin")->value(), 
                                          qNode->first_node("connection")->value(),
                                          qNode->last_node()->name());
-
+                }
+                if(std::string(qNode->name()).compare("currentDevice") == 0)
+                {
+                    m_myIpAddress = qNode->parent()->first_attribute("ip")->value();
                 }
             }
 
             m_devicesMap.insert(std::make_pair(name, td_device(boost::asio::ip::address::from_string(ipAddress), feature)));
         }
         std::cout << "..............Done." << std::endl;
-        printDeviceMap();
+        //printDeviceMap();
         return false;
     }
 
@@ -107,6 +110,11 @@ namespace ClusterController
     boost::asio::ip::address DeviceManager::getIPfromName(std::string& name)
     {
         return m_devicesMap[name].first;
+    }
+
+    const std::string& DeviceManager::getMyIpAddress() const
+    {
+        return m_myIpAddress;
     }
 
     DeviceManager::~DeviceManager()

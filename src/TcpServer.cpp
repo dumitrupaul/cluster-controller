@@ -1,5 +1,7 @@
 #include "TcpServer.hpp"
 #include <boost/bind.hpp>
+#include <boost/log/trivial.hpp>
+#include <iostream>
 
 namespace ClusterController
 {
@@ -27,5 +29,19 @@ namespace ClusterController
         }
 
         startAccept();
+    }
+
+    std::string TcpServer::getIpAddress()
+    {
+        boost::system::error_code error;
+        boost::asio::ip::tcp::endpoint endpoint = serverAcceptor.local_endpoint(error);
+        if (error)
+        {
+            // An error occurred.
+            BOOST_LOG_TRIVIAL(error) << "Can't get local IP Address";
+            return NULL;
+        }
+
+        return std::string(endpoint.address().to_string().c_str());
     }
 }

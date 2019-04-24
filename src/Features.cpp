@@ -1,4 +1,4 @@
-#include "Features.h"
+#include "Features.hpp"
 #include <iostream>
 
 namespace ClusterController
@@ -10,7 +10,6 @@ namespace ClusterController
 
     void Features::insertButton(char* value, char* c, char* act)
     {
-        std::cout << act << std::endl;
         e_actions action = e_doNothing;
         if(std::string(act).compare("onPressSend") == 0)
         {
