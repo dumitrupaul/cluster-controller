@@ -16,9 +16,12 @@ $(EXE): $(OBJ)
 	g++ $^ $(LDLIBS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(@D)
 	g++ $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 clean:
-	rm $(EXE)
+	rm -f $(EXE)
 	rm -rf obj/*.o all
+cleanlog:
+	rm -f *.log
 
