@@ -76,6 +76,7 @@ namespace ClusterController
                 if(std::string(qNode->name()).compare("currentDevice") == 0)
                 {
                     m_myIpAddress = qNode->parent()->first_attribute("ip")->value();
+                    m_myName = qNode->parent()->first_attribute("name")->value();
                 }
             }
 
@@ -115,6 +116,11 @@ namespace ClusterController
     const std::string& DeviceManager::getMyIpAddress() const
     {
         return m_myIpAddress;
+    }
+    
+    Features& DeviceManager::getMyFeatures()
+    {
+        return m_devicesMap.find(m_myName)->second.second;       
     }
 
     DeviceManager::~DeviceManager()

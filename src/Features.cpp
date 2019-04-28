@@ -39,5 +39,25 @@ namespace ClusterController
                       << it->conn.to_string() << " action: " << it->action << std::endl;
         }
     }
+    
+    std::vector<Led>& Features::getLedList()
+    {
+        return m_ledList;
+    }
+    
+    std::vector<Button>& Features::getButtonList()
+    {
+        return m_buttonList;
+    }
+    
+    int Features::findLed(int pin)
+    {
+        for(int it = 0 ; it < m_ledList.size() ; ++it)
+        {
+            if(m_ledList[it].pinNumber == pin) return it;
+        }
+        
+        return -1;
+    }
 
 }

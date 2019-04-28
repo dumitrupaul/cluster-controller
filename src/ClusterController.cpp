@@ -4,6 +4,7 @@
 #include <boost/thread.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup.hpp>
+#include <wiringPi.h>
 
 #define COMMUNICATION_PORT 44444
 
@@ -72,6 +73,8 @@ int main()
   {
     return EXIT_FAILURE;
   }
+  
+  wiringPiSetup();
 
   boost::thread th(&handleClient);
   boost::thread th1(&handleServer);

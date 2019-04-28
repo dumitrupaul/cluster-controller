@@ -3,6 +3,9 @@
 #include <iostream>
 #include <boost/log/trivial.hpp>
 #include <boost/lexical_cast.hpp>
+#include <wiringPi.h>
+#include "Features.hpp"
+#include "DeviceManager.hpp"
 
 namespace ClusterController
 {
@@ -50,6 +53,29 @@ namespace ClusterController
                 if(m_recvMsg.getMessageType() == e_MSG_PING)
                 {
                     BOOST_LOG_TRIVIAL(info) << "WE HAVE BEEN PINGED";
+                }
+                else
+                if(m_recvMsg.getMessageType() == e_MSG_LED)
+                {
+                    Features &f = DeviceManager::getInstance()->getMyFeatures();
+                    if(f.findLed(17) != -1) 
+                    {
+                        pinMode(0, OUTPUT);
+                        Led& l= f.getLedList()[f.findLed(17)];
+                        if(l.status)
+                        {
+                            l.status = false;
+                            digitalWrite(0, LOW);
+                            BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned OFF.";
+                        }
+                        else
+                        {
+                            l.status = true;
+                            digitalWrite(0, HIGH);
+                            BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned ON.";
+                        }
+                    }
+                    
                 }
             }
         

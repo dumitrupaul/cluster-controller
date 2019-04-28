@@ -14,8 +14,9 @@ namespace ClusterController
     };
     struct Led
     {
-        Led(char* pin):pinNumber(atoi(pin)){}
+        Led(char* pin):pinNumber(atoi(pin)), status(false){}
         int pinNumber;
+        bool status;
     };
 
     struct Button
@@ -35,6 +36,12 @@ namespace ClusterController
             void insertButton(char* value, char* conn, char* act);
             //useful for debug
             void printFeatures();
+            
+            int findLed(int pin);
+            
+            std::vector<Led>& getLedList();
+            
+            std::vector<Button>& getButtonList();
 
         private:
             std::vector<Button> m_buttonList;

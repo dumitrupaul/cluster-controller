@@ -19,6 +19,8 @@ namespace ClusterController
             boost::asio::ip::address getIPfromName(std::string& name) const;
 
             const std::string& getMyIpAddress() const;
+            
+            Features& getMyFeatures();
 
         private:
             //useful for debug
@@ -30,6 +32,7 @@ namespace ClusterController
 
             static DeviceManager* spInstance;
             std::string m_myIpAddress;
+            std::string m_myName;
             std::map<std::string, td_device> m_devicesMap;  
     };
 }
