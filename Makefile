@@ -23,5 +23,6 @@ clean:
 	rm -f $(EXE)
 	rm -rf obj/*.o all
 cleanlog:
-	rm *.log
+	rm -f *.log
+
 
