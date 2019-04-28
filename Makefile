@@ -20,7 +20,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 clean:
-	rm $(EXE)
+	rm -f $(EXE)
 	rm -rf obj/*.o all
 cleanlog:
 	rm *.log

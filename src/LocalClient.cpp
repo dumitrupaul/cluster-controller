@@ -3,7 +3,7 @@
 #include <iostream>
 #include "DeviceManager.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include "Message.hpp"
+#include "MessageProcessor.hpp"
 
 namespace ClusterController
 {
@@ -72,11 +72,9 @@ namespace ClusterController
     {
         using namespace std;
 
-        //m_txBuffer.clear();
-
         vector<string> names(DeviceManager::getInstance()->getNames());
         int selectedIdx;
-        int msgType;
+        uint32_t msgType;
         int printIdx = 0;
         cout << endl << "Select a device from the list:" << endl;
 
@@ -91,13 +89,8 @@ namespace ClusterController
         cout << endl << "Select the type of message you want to send: \n\t[0 - PING] \n\t[1 - LED]\n";
         cin >> msgType;
 
-        Message msg(static_cast<MessageType>(msgType));
-
-        if(!msg.mouldMessage(m_txBuffer))
-        {
-            //avoid sending invalid message
-            m_txBuffer.consume(m_txBuffer.size());
-        }
+        if(!MessageProcessor::processSentMessageType(m_txBuffer, msgType))
+            handleInput();
 
     }
 }

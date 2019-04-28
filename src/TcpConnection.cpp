@@ -3,6 +3,8 @@
 #include <iostream>
 #include <boost/log/trivial.hpp>
 #include <boost/lexical_cast.hpp>
+#include "MessageHeader.hpp"
+#include "MessageProcessor.hpp"
 
 namespace ClusterController
 {
@@ -39,20 +41,11 @@ namespace ClusterController
             assert(bytes_transferred < m_rxBuffer.size() && "Size of the info transferred is more than the buffer size");
             BOOST_LOG_TRIVIAL(info) << "Received message [bytes transferred:" << bytes_transferred << "]";
 
-            if(!m_recvMsg.decomposeMessage(m_rxBuffer))
+            if(!MessageProcessor::processReceivedMessage(m_rxBuffer))
             {
-                //deleting the buffer in case of failure
+                //delete the buffer if the process failed
                 m_rxBuffer.consume(m_rxBuffer.size());
             }
-            else
-            {
-                //message received and decoded successfully
-                if(m_recvMsg.getMessageType() == e_MSG_PING)
-                {
-                    BOOST_LOG_TRIVIAL(info) << "WE HAVE BEEN PINGED";
-                }
-            }
-        
             
         }
         else if (error == boost::asio::error::eof)
