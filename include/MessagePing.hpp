@@ -1,7 +1,6 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 #include <boost/asio.hpp>
-#include "MessageHeader.hpp"
 #include "Message_I.hpp"
 
 namespace ClusterController
@@ -20,7 +19,7 @@ namespace ClusterController
 
             virtual void readAdditionalVariables();
 
-            MessageType getMessageType();
+            virtual MessageType getMessageType() const;
 
             ~MessagePing();
 

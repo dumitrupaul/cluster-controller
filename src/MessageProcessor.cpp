@@ -5,8 +5,6 @@
 #include <boost/log/trivial.hpp>
 #include <boost/make_unique.hpp>
 #include <iostream>
-#include <wiringPi.h>
-#include "DeviceManager.hpp"
 
 namespace ClusterController
 {
@@ -21,24 +19,9 @@ namespace ClusterController
                 return false;
             
             msg->decomposeMessage(rxBuffer);
-            Features &f = DeviceManager::getInstance()->getMyFeatures();
-            if(f.findLed(17) != -1) 
-            {
-                pinMode(0, OUTPUT);
-                Led& l= f.getLedList()[f.findLed(17)];
-                if(l.status)
-                {
-                    l.status = false;
-                    digitalWrite(0, LOW);
-                    BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned OFF.";
-                }
-                else
-                {
-                    l.status = true;
-                    digitalWrite(0, HIGH);
-                    BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned ON.";
-                }
-            }
+            
+            BOOST_LOG_TRIVIAL(info) << msg->getMessageType();
+            DeviceManager::getInstance()->processReceivedMessage(msg);
         }
         else
         {
@@ -57,8 +40,17 @@ namespace ClusterController
             return false;
 
         msg->readAdditionalVariables();
-        msg->mouldMessage(txBuffer);
+        if(!msg->mouldMessage(txBuffer))
+            return false;
 
+        return true;
+    }
+    
+    bool MessageProcessor::processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I>& msg)
+    {
+        if(!msg->mouldMessage(txBuffer))
+            return false;
+        
         return true;
     }
 

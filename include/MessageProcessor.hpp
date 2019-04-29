@@ -13,6 +13,8 @@ namespace ClusterController
             static bool processReceivedMessage(boost::asio::streambuf& rxBuffer);
 
             static bool processSentMessageType(boost::asio::streambuf& txBuffer, uint32_t msgType);
+            
+            static bool processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I>& msg);
 
         private:
             static bool createMessageFromType(MessageType msgType, std::unique_ptr<Message_I>& msg, bool logType);

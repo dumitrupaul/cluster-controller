@@ -13,6 +13,8 @@ namespace ClusterController
             static DeviceManager* getInstance();
 
             bool loadDevices();
+            
+            void processReceivedMessage(std::unique_ptr<Message_I>& msg);
 
             std::vector<std::string> getNames();
 

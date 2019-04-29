@@ -2,22 +2,33 @@
 #include <boost/bind.hpp>
 #include <iostream>
 #include "DeviceManager.hpp"
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include "MessageProcessor.hpp"
+#include <wiringPi.h>
+
+#define DEBOUNCE_DELAY 1000
 
 namespace ClusterController
 {
 
-    LocalClient::LocalClient(boost::asio::io_service &io_service, int serverPort) : 
+    LocalClient::LocalClient(boost::asio::io_service &io_service, int serverPort, bool aMode) : 
                             m_serverPort(serverPort), 
-                            m_socket(io_service)
+                            autoMode(aMode),
+                            m_socket(io_service),
+                            sentMessageTimeInMs(0)                            
     {
+        if(autoMode){
+            std::cout << "Autonomous GPIO Mode engaged. No input necessary.\n";
+            DeviceManager::getInstance()->getMyFeatures().printFeatures();
+        }
         startConnection();
     }
 
     void LocalClient::startConnection()
     {  
-        handleInput();
+        if(autoMode)
+            handleGPIO();
+        else
+            handleInput();
 
         tcp::endpoint endPoint(m_ipAddress, m_serverPort);
         m_socket.async_connect(endPoint, boost::bind(&LocalClient::onConnect, this, boost::asio::placeholders::error));
@@ -92,5 +103,58 @@ namespace ClusterController
         if(!MessageProcessor::processSentMessageType(m_txBuffer, msgType))
             handleInput();
 
+    }
+    
+    void LocalClient::handleGPIO()
+    {
+        Features& features = DeviceManager::getInstance()->getMyFeatures();
+        
+        std::vector<Button>& buttons = features.getButtonList();
+        
+        for(uint32_t buttonIdx = 0; buttonIdx < buttons.size(); ++buttonIdx)
+        {        
+            pinMode(buttons[buttonIdx].pinNumber, INPUT);
+            pullUpDnControl(buttons[buttonIdx].pinNumber, PUD_UP);
+        }
+        
+        bool buttonPressed = false;
+        uint32_t currentTimeInMs;
+        
+        while(!buttonPressed)
+        {
+            currentTimeInMs = millis();
+            if(currentTimeInMs - sentMessageTimeInMs > DEBOUNCE_DELAY)
+            {
+                bool returnValue = scanButtons(buttons);
+                if(returnValue)
+                    buttonPressed = true;
+            }
+        }
+        
+    }
+    
+    bool LocalClient::scanButtons(std::vector<Button>& buttons)
+    {
+        for(uint32_t buttonIdx = 0; buttonIdx < buttons.size(); ++buttonIdx)
+        { 
+            if(digitalRead(buttons[buttonIdx].pinNumber) == LOW)
+            {
+                if(!MessageProcessor::processSentMessagePtr(m_txBuffer, buttons[buttonIdx].sendMsg))
+                    return false;
+                sentMessageTimeInMs = millis();
+                m_ipAddress = buttons[buttonIdx].conn;
+                return true;
+            }
+        }
+        return false;
+        
+        //if(digitalRead(buttons[1].pinNumber) == LOW)
+        //{
+            //MessageProcessor::processSentMessagePtr(m_txBuffer, buttons[0].sendMsg);
+            //sentMessageTimeInMs = millis();
+            //m_ipAddress = buttons[0].conn;
+            
+            //return true;
+        //}
     }
 }

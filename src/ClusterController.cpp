@@ -33,13 +33,13 @@ static void init_log()
 #endif
 }
 
-void handleClient()
+void handleClient(bool autoMode)
 {
   try
   {
     boost::asio::io_service io_service;
 
-    ClusterController::LocalClient client(io_service, COMMUNICATION_PORT);
+    ClusterController::LocalClient client(io_service, COMMUNICATION_PORT, autoMode);
 
     io_service.run();
   }
@@ -65,8 +65,46 @@ void handleServer()
   }
 }
 
-int main()
+void myInterrupt()
 {
+  ClusterController::Features &f = ClusterController::DeviceManager::getInstance()->getMyFeatures();
+  if(f.findLed(17) != -1) 
+  {
+      pinMode(0, OUTPUT);
+      ClusterController::Led& l= f.getLedList()[f.findLed(17)];
+      if(l.status)
+      {
+          l.status = false;
+          digitalWrite(0, LOW);
+          BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned OFF.";
+      }
+      else
+      {
+          l.status = true;
+          digitalWrite(0, HIGH);
+          BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned ON.";
+      }
+  }
+  
+}
+
+int main(int argc, char* argv[])
+{
+  bool autoMode = false;
+  
+  if(argc > 2)
+  {
+    std::cerr << "Usage: " << argv[0] << " auto=<true>/<false>\n";
+  }
+  else if(argc == 2)
+  {
+    std::string arg(argv[1]);
+    if(arg.compare("auto=true") == 0)
+      autoMode = true;
+    else
+      std::cerr << "Usage: " << argv[0] << " auto=<true>/<false>. Mode auto set to false.\n";
+  }
+
   init_log();
 
   if(ClusterController::DeviceManager::getInstance()->loadDevices())
@@ -75,11 +113,11 @@ int main()
   }
   
   wiringPiSetup();
-
-  boost::thread th(&handleClient);
-  boost::thread th1(&handleServer);
-  th1.join();
-  th.join();
+  
+  boost::thread CLIENTthread(boost::bind(&handleClient, autoMode));
+  boost::thread SERVERthread(&handleServer);
+  SERVERthread.join();
+  CLIENTthread.join();
 
   return EXIT_SUCCESS;
 }

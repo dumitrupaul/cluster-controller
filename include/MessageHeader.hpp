@@ -18,6 +18,8 @@ namespace ClusterController
     class MessageHeader
     {
         public:
+            const uint32_t headerLength = 40U;
+            
             MessageHeader();
 
             MessageHeader(const MessageHeader& header);

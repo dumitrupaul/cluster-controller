@@ -1,7 +1,6 @@
 #ifndef MESSAGELED_HPP
 #define MESSAGELED_HPP
 #include <boost/asio.hpp>
-#include "MessageHeader.hpp"
 #include "Message_I.hpp"
 
 namespace ClusterController
@@ -17,6 +16,8 @@ namespace ClusterController
     {
         public:
             MessageLed();
+            
+            MessageLed(LedAction ledAct);
 
             MessageLed(const MessageHeader& header);
 
@@ -30,7 +31,7 @@ namespace ClusterController
 
             LedAction getLedAction() const;
 
-            MessageType getMessageType();
+            virtual MessageType getMessageType() const;
 
             ~MessageLed();
 

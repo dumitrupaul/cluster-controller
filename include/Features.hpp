@@ -2,9 +2,11 @@
 #define FEATURES_HPP
 #include <vector>
 #include <boost/asio.hpp>
+#include "Message_I.hpp"
 
 namespace ClusterController
 {
+    
     enum e_actions
     {
         e_doNothing = 0,
@@ -14,17 +16,22 @@ namespace ClusterController
     };
     struct Led
     {
-        Led(char* pin):pinNumber(atoi(pin)), status(false){}
+        Led(char* pin) : 
+            pinNumber(atoi(pin)), status(false){}
+            
         int pinNumber;
         bool status;
     };
 
     struct Button
     {
-        Button(char* pin, boost::asio::ip::address c, e_actions a) : pinNumber(atoi(pin)), conn(c), action(a){}
+        Button(char* pin, boost::asio::ip::address c, e_actions a) : 
+            pinNumber(atoi(pin)), conn(c), action(a){}
+            
         int pinNumber;
         boost::asio::ip::address conn;
         e_actions action;
+        std::shared_ptr<Message_I> sendMsg;
 
     };
 
@@ -33,8 +40,8 @@ namespace ClusterController
         public:
             void insertLed(char* value);
 
-            void insertButton(char* value, char* conn, char* act);
-            //useful for debug
+            void insertButton(char* value, char* conn, char* act, const char* msgChar);
+            //useful for debugging
             void printFeatures();
             
             int findLed(int pin);

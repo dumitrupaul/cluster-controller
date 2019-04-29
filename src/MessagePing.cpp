@@ -23,12 +23,12 @@ namespace ClusterController
 
     bool MessagePing::mouldMessage(boost::asio::streambuf& txBuffer)
     {
-        m_header.setLength(m_header.getLength() + sizeof(END_OF_MESSAGE));
+        m_header.setLength(m_header.headerLength + sizeof(END_OF_MESSAGE));
 
         txBuffer.consume(txBuffer.size());
 
         m_header.encodeHeader(txBuffer);
-
+        
         txBuffer.commit(boost::asio::buffer_copy(txBuffer.prepare(sizeof(END_OF_MESSAGE)),
                             boost::asio::buffer(&(END_OF_MESSAGE),sizeof(END_OF_MESSAGE))));
 
@@ -60,7 +60,7 @@ namespace ClusterController
         return true;
     }
 
-    MessageType MessagePing::getMessageType()
+    MessageType MessagePing::getMessageType() const
     {
         return m_header.getMessageType();
     }
