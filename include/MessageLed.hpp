@@ -17,8 +17,6 @@ namespace ClusterController
     {
         public:
             MessageLed();
-            
-            MessageLed(LedAction ledAct);
 
             MessageLed(const MessageHeader& header);
 
@@ -32,7 +30,7 @@ namespace ClusterController
 
             LedAction getLedAction() const;
 
-            virtual MessageType getMessageType() const;
+            MessageType getMessageType();
 
             virtual ~MessageLed() = default;
 

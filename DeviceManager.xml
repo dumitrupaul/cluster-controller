@@ -2,20 +2,16 @@
 <DeviceManager>
     <devices>
         <device name="pinode1" ip="172.27.0.1">
-            <currentDevice/>
-            <led pin="0"/>
-            <button pin="1">
-                <connection>172.27.0.1</connection>
-                <onPressSend>MSG_PING</onPressSend>
-            </button>
             <button pin="2">
                 <connection>172.27.0.2</connection>
-                <onPressSend>MSG_LED_TOGGLE</onPressSend>
+                <onPressSend>MSG_PING</onPressSend>
             </button>
         </device>
         <device name="pinode2" ip="172.27.0.2">
+            <led pin="17"/>
         </device>
         <device name="ubuntunode" ip="172.27.0.3">
+            <currentDevice/>
         </device>
     </devices>
 </DeviceManager>

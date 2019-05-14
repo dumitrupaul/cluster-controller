@@ -14,12 +14,6 @@ namespace ClusterController
         //TODO
         m_action = e_Toggle_Led;
     }
-    
-    MessageLed::MessageLed(LedAction ledAct) : MessageLed()
-    {
-        m_action = ledAct;
-    }
-
 
     bool MessageLed::mouldMessage(boost::asio::streambuf& txBuffer)
     {
@@ -57,7 +51,6 @@ namespace ClusterController
         {
             CLUSTER_LOG(info) << "Could not open stream from buffer";
             rxBuffer.consume(rxBuffer.size());
-
             return false;
         }
 
@@ -74,7 +67,6 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-
             CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
@@ -88,7 +80,7 @@ namespace ClusterController
         return true;
     }
 
-    MessageType MessageLed::getMessageType() const
+    MessageType MessageLed::getMessageType()
     {
         return m_header.getMessageType();
     }

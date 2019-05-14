@@ -3,9 +3,6 @@
 #include <sstream>
 #include <iostream>
 #include "rapidxml.hpp"
-#include "Message_I.hpp"
-#include "MessageLed.hpp"
-#include <wiringPi.h>
 
 namespace ClusterController
 {
@@ -65,21 +62,13 @@ namespace ClusterController
                 }
                 if(std::string(qNode->name()).compare("button") == 0)
                 {
-                    if(std::string(qNode->last_node()->name()).compare("onPressSend") == 0)
-                        feature.insertButton(qNode->first_attribute("pin")->value(), 
-                                             qNode->first_node("connection")->value(),
-                                             qNode->last_node()->name(),
-                                             qNode->last_node()->value());
-                    else
-                        feature.insertButton(qNode->first_attribute("pin")->value(), 
-                                             qNode->first_node("connection")->value(),
-                                             qNode->last_node()->name(),
-                                             "none");
+                    feature.insertButton(qNode->first_attribute("pin")->value(), 
+                                         qNode->first_node("connection")->value(),
+                                         qNode->last_node()->name());
                 }
                 if(std::string(qNode->name()).compare("currentDevice") == 0)
                 {
-                    m_myIpAddress = qNode->parent()->first_attribute("ip")->value();
-                    m_myName = qNode->parent()->first_attribute("name")->value();
+                    mMyIpAddress = qNode->parent()->first_attribute("ip")->value();
                 }
             }
 
@@ -119,47 +108,6 @@ namespace ClusterController
     const std::string& DeviceManager::getMyIpAddress() const
     {
         return mMyIpAddress;
-    }
-    
-    Features& DeviceManager::getMyFeatures()
-    {
-        return m_devicesMap.find(m_myName)->second.second;       
-    }
-    
-    void DeviceManager::processReceivedMessage(std::shared_ptr<Message_I> msg)
-    {
-        if(msg->getMessageType() == e_MSG_LED)
-        {
-            MessageLed msgLed = dynamic_cast<MessageLed&>(*msg);
-            
-            Features &f = getMyFeatures();
-            
-            std::vector<Led>& leds = f.getLedList();
-            
-            for(uint32_t ledIdx = 0; ledIdx < leds.size(); ++ledIdx)
-            {
-                pinMode(leds[ledIdx].pinNumber, OUTPUT);
-                if(msgLed.getLedAction() == e_Toggle_Led)
-                {
-                    if(leds[ledIdx].status)
-                    {
-                        leds[ledIdx].status = false;
-                        digitalWrite(leds[ledIdx].pinNumber, LOW);
-                    }
-                    else
-                    {
-                        leds[ledIdx].status = true;
-                        digitalWrite(leds[ledIdx].pinNumber, HIGH);
-                    }
-                }
-                else if(msgLed.getLedAction() == e_Blink_Led)
-                {
-                    
-                    
-                }
-            }
-            
-        }
     }
 
 }

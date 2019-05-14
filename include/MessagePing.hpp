@@ -20,7 +20,7 @@ namespace ClusterController
 
             virtual void readAdditionalVariables();
 
-            virtual MessageType getMessageType() const;
+            MessageType getMessageType();
 
             virtual ~MessagePing() = default;
 

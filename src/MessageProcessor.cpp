@@ -1,8 +1,6 @@
 #include "MessageProcessor.hpp"
 #include "MessagePing.hpp"
 #include "MessageLed.hpp"
-#include "DeviceManager.hpp"
-
 #include <iostream>
 
 namespace ClusterController
@@ -19,8 +17,6 @@ namespace ClusterController
             
             if(!msg->decomposeMessage(recvMsgHeader, rxBuffer))
                 return false;
-            
-            DeviceManager::getInstance()->processReceivedMessage(std::move(msg));
         }
         else
         {
@@ -42,14 +38,6 @@ namespace ClusterController
         if(!msg->mouldMessage(txBuffer))
             return false;
 
-        return true;
-    }
-    
-    bool MessageProcessor::processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I> msg)
-    {
-        if(!msg->mouldMessage(txBuffer))
-            return false;
-        
         return true;
     }
 
