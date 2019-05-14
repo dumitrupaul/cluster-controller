@@ -6,7 +6,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 CPPFLAGS = -Iinclude
 CFLAGS = -c -std=c++14 -Wall -DBOOST_LOG_DYN_LINK
-LDLIBS = -lboost_system -lboost_thread -lpthread -lboost_log -lboost_log_setup -lwiringPi
+LDLIBS = -lboost_system -lboost_thread -lpthread -lboost_log -lboost_log_setup
 
 .PHONY: all clean
 
