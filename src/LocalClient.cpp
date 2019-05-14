@@ -52,8 +52,6 @@ namespace ClusterController
 
     void LocalClient::onWrite(const boost::system::error_code &error, size_t bytes_transferred)
     {
-        //m_txBuffer.consume(bytes_transferred);
-
         if (!error)
         {
             std::cout << "Message transmitted successfully [size:"<< bytes_transferred << "]" << std::endl;
@@ -73,9 +71,9 @@ namespace ClusterController
         using namespace std;
 
         vector<string> names(DeviceManager::getInstance()->getNames());
-        int selectedIdx;
+        uint32_t selectedIdx;
         uint32_t msgType;
-        int printIdx = 0;
+        uint32_t printIdx = 0;
         cout << endl << "Select a device from the list:" << endl;
 
         for (vector<string>::const_iterator i = names.begin(); i != names.end(); ++i, ++printIdx)
@@ -84,10 +82,20 @@ namespace ClusterController
         }
 
         cin >> selectedIdx;
+
+        //Input validation
+        while(selectedIdx < 0 || selectedIdx > names.size() - 1)
+        {
+            cout << "Invalid selection\n";
+            cin >> selectedIdx;
+        }
         
         m_ipAddress = DeviceManager::getInstance()->getIPfromName(names[selectedIdx]);
         cout << endl << "Select the type of message you want to send: \n\t[0 - PING] \n\t[1 - LED]\n";
+
         cin >> msgType;
+
+        //TODO: Input validation
 
         if(!MessageProcessor::processSentMessageType(m_txBuffer, msgType))
             handleInput();

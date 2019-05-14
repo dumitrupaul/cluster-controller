@@ -5,12 +5,8 @@
 
 namespace ClusterController
 {
-    MessagePing::MessagePing()
+    MessagePing::MessagePing() : m_header(e_MSG_PING)
     {
-        m_header.setMessageType(e_MSG_PING);
-        char ipAddress[32];
-        strcpy(ipAddress, DeviceManager::getInstance()->getMyIpAddress().c_str());
-        m_header.setIpAddress(ipAddress);
     }
 
     MessagePing::MessagePing(const MessageHeader& header) : m_header(header)
@@ -46,7 +42,7 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected amount of data in the buffer";
+            BOOST_LOG_TRIVIAL(fatal) << __FILE__ << __LINE__ << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
         }

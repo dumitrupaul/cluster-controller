@@ -29,8 +29,8 @@ namespace ClusterController
             ~DeviceManager() = default;
 
             static DeviceManager* spInstance;
-            std::string m_myIpAddress;
-            std::map<std::string, td_device> m_devicesMap;  
+            std::string mMyIpAddress;
+            std::map<std::string, td_device> mDevicesMap;  
     };
 }
 

@@ -1,27 +1,24 @@
 #include "MessageLed.hpp"
-#include "DeviceManager.hpp"
 #include <iostream>
 #include <boost/log/trivial.hpp>
 
 namespace ClusterController
 {
-    MessageLed::MessageLed()
+    MessageLed::MessageLed() : m_header(e_MSG_LED)
     {
-        m_header.setMessageType(e_MSG_LED);
-        char ipAddress[32];
-        strcpy(ipAddress, DeviceManager::getInstance()->getMyIpAddress().c_str());
-        m_header.setIpAddress(ipAddress);
+        //TODO
         m_action = e_Toggle_Led;
     }
 
     MessageLed::MessageLed(const MessageHeader& header) : m_header(header)
     {
+        //TODO
         m_action = e_Toggle_Led;
     }
 
     bool MessageLed::mouldMessage(boost::asio::streambuf& txBuffer)
     {
-        m_header.setLength(MessageHeader::c_headerLength + sizeof(m_action) + sizeof(END_OF_MESSAGE));
+        m_header.setLength(MessageHeader::cHeaderLength + sizeof(m_action) + sizeof(END_OF_MESSAGE));
 
         txBuffer.consume(txBuffer.size());
 
@@ -52,6 +49,7 @@ namespace ClusterController
         if(!is)
         {
             BOOST_LOG_TRIVIAL(info) << "Could not open stream from buffer";
+            rxBuffer.consume(rxBuffer.size());
             return false;
         }
 
@@ -60,6 +58,7 @@ namespace ClusterController
         {
             BOOST_LOG_TRIVIAL(info) << "Buffer failure while decomposing message only "
                                     << is.gcount() << " bytes could be read, instead of " << sizeof(m_action);
+            rxBuffer.consume(rxBuffer.size());
             return false;
         }
 
@@ -67,7 +66,7 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected amount of data in the buffer";
+            BOOST_LOG_TRIVIAL(fatal) << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
         }

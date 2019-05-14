@@ -9,10 +9,10 @@ namespace ClusterController
     bool MessageProcessor::processReceivedMessage(boost::asio::streambuf& rxBuffer)
     {
         MessageHeader m_recvMsgHeader;
-        std::unique_ptr<Message_I> msg = createMessageFromType(m_recvMsgHeader.getMessageType(), false);
-
+        
         if(m_recvMsgHeader.decodeHeader(rxBuffer))
         {
+            std::unique_ptr<Message_I> msg = createMessageFromType(m_recvMsgHeader.getMessageType(), false);
             if(!msg)
                 return false;
             
