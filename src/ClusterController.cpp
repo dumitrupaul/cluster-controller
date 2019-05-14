@@ -73,10 +73,10 @@ int main()
     return EXIT_FAILURE;
   }
 
-  std::thread th(&handleClient);
-  std::thread th1(&handleServer);
-  th1.join();
-  th.join();
+  std::thread ClientThread(&handleClient);
+  std::thread ServerThread(&handleServer);
+  ServerThread.join();
+  ClientThread.join();
 
   return EXIT_SUCCESS;
 }
