@@ -32,7 +32,7 @@ namespace ClusterController
 
             MessageType getMessageType();
 
-            ~MessageLed();
+            virtual ~MessageLed() = default;
 
         private:
             MessageHeader m_header;

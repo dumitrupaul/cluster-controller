@@ -24,9 +24,9 @@ namespace ClusterController
             //useful for debug
             void printDeviceMap();
 
-            DeviceManager();
+            DeviceManager() = default;
 
-            ~DeviceManager();
+            ~DeviceManager() = default;
 
             static DeviceManager* spInstance;
             std::string m_myIpAddress;

@@ -22,7 +22,7 @@ namespace ClusterController
 
             MessageType getMessageType();
 
-            ~MessagePing();
+            virtual ~MessagePing() = default;
 
         private:
             MessageHeader m_header;

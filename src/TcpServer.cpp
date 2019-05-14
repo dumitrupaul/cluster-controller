@@ -39,7 +39,7 @@ namespace ClusterController
         {
             // An error occurred.
             BOOST_LOG_TRIVIAL(error) << "Can't get local IP Address";
-            return NULL;
+            return nullptr;
         }
 
         return std::string(endpoint.address().to_string().c_str());

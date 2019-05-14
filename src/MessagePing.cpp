@@ -17,10 +17,6 @@ namespace ClusterController
     {
     }
 
-    MessagePing::~MessagePing()
-    {
-    }
-
     bool MessagePing::mouldMessage(boost::asio::streambuf& txBuffer)
     {
         m_header.setLength(m_header.getLength() + sizeof(END_OF_MESSAGE));

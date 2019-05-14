@@ -1,7 +1,7 @@
 #include "TcpServer.hpp"
 #include "LocalClient.hpp"
 #include "DeviceManager.hpp"
-#include <boost/thread.hpp>
+#include <thread>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup.hpp>
 
@@ -73,8 +73,8 @@ int main()
     return EXIT_FAILURE;
   }
 
-  boost::thread th(&handleClient);
-  boost::thread th1(&handleServer);
+  std::thread th(&handleClient);
+  std::thread th1(&handleServer);
   th1.join();
   th.join();
 

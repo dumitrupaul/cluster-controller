@@ -19,13 +19,9 @@ namespace ClusterController
         m_action = e_Toggle_Led;
     }
 
-    MessageLed::~MessageLed()
-    {
-    }
-
     bool MessageLed::mouldMessage(boost::asio::streambuf& txBuffer)
     {
-        m_header.setLength(m_header.getLength() + sizeof(m_action) + sizeof(END_OF_MESSAGE));
+        m_header.setLength(MessageHeader::c_headerLength + sizeof(m_action) + sizeof(END_OF_MESSAGE));
 
         txBuffer.consume(txBuffer.size());
 

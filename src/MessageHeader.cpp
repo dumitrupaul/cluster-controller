@@ -11,10 +11,6 @@ namespace ClusterController
     {
     }
 
-    MessageHeader::~MessageHeader()
-    {
-    }
-
     MessageHeader::MessageHeader(const MessageHeader& header)
     {
         strcpy(ipAddress, header.getIpAddress());

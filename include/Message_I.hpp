@@ -12,6 +12,8 @@ namespace ClusterController
             virtual bool decomposeMessage(boost::asio::streambuf& m_rxBuffer) = 0;
 
             virtual void readAdditionalVariables() = 0;
+
+            virtual ~Message_I() = default;
     };
 }
 #endif //MESSAGE_I_HPP

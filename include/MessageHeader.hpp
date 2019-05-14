@@ -18,6 +18,8 @@ namespace ClusterController
     class MessageHeader
     {
         public:
+            static const uint32_t c_headerLength = 40;
+            
             MessageHeader();
 
             MessageHeader(const MessageHeader& header);
@@ -38,7 +40,7 @@ namespace ClusterController
 
             void setLength(uint32_t len);
 
-            ~MessageHeader();
+            ~MessageHeader() = default;
 
         private:
             char ipAddress[32];

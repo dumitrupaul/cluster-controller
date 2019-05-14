@@ -11,10 +11,6 @@ namespace ClusterController
 
     DeviceManager* DeviceManager::spInstance = NULL;
 
-    DeviceManager::DeviceManager()
-    {
-    }
-
     DeviceManager* DeviceManager::getInstance()
     {
         if(!spInstance)
@@ -117,7 +113,4 @@ namespace ClusterController
         return m_myIpAddress;
     }
 
-    DeviceManager::~DeviceManager()
-    {
-    }
 }
