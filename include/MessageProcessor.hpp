@@ -1,5 +1,6 @@
 #ifndef MESSAGEPROCESSOR_HPP
 #define MESSAGEPROCESSOR_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
 #include "MessageHeader.hpp"
 
@@ -14,12 +15,10 @@ namespace ClusterController
 
             static bool processSentMessageType(boost::asio::streambuf& txBuffer, uint32_t msgType);
             
-            static bool processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I>& msg);
+            static bool processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I> msg);
 
         private:
-            static bool createMessageFromType(MessageType msgType, std::unique_ptr<Message_I>& msg, bool logType);
-
-            MessageProcessor() {}
+            static std::unique_ptr<Message_I> createMessageFromType(MessageType msgType, bool logType);
 
     };
 }

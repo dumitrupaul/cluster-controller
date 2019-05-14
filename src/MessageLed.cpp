@@ -1,21 +1,18 @@
 #include "MessageLed.hpp"
 #include "DeviceManager.hpp"
 #include <iostream>
-#include <boost/log/trivial.hpp>
 
 namespace ClusterController
 {
-    MessageLed::MessageLed()
+    MessageLed::MessageLed() : m_header(e_MSG_LED)
     {
-        m_header.setMessageType(e_MSG_LED);
-        char ipAddress[32];
-        strcpy(ipAddress, DeviceManager::getInstance()->getMyIpAddress().c_str());
-        m_header.setIpAddress(ipAddress);
+        //TODO
         m_action = e_Toggle_Led;
     }
 
     MessageLed::MessageLed(const MessageHeader& header) : m_header(header)
     {
+        //TODO
         m_action = e_Toggle_Led;
     }
     
@@ -24,13 +21,9 @@ namespace ClusterController
         m_action = ledAct;
     }
 
-    MessageLed::~MessageLed()
-    {
-    }
-
     bool MessageLed::mouldMessage(boost::asio::streambuf& txBuffer)
     {
-        m_header.setLength(m_header.headerLength + sizeof(m_action) + sizeof(END_OF_MESSAGE));
+        m_header.setLength(MessageHeader::cHeaderLength + sizeof(m_action) + sizeof(END_OF_MESSAGE));
 
         txBuffer.consume(txBuffer.size());
 
@@ -53,21 +46,23 @@ namespace ClusterController
         return true;
     }
 
-    bool MessageLed::decomposeMessage(boost::asio::streambuf& rxBuffer)
+    bool MessageLed::decomposeMessage(MessageHeader msgHeader, boost::asio::streambuf& rxBuffer)
     {
+        m_header = msgHeader;
+        
         std::istream is(&rxBuffer);
         char buf[MAX_MSG_SIZE - m_header.getLength()];
 
         if(!is)
         {
-            BOOST_LOG_TRIVIAL(info) << "Could not open stream from buffer";
+            CLUSTER_LOG(info) << "Could not open stream from buffer";
             return false;
         }
 
         is.read(buf, sizeof(m_action));
         if(!is) 
         {
-            BOOST_LOG_TRIVIAL(info) << "Buffer failure while decomposing message only "
+            CLUSTER_LOG(info) << "Buffer failure while decomposing message only "
                                     << is.gcount() << " bytes could be read, instead of " << sizeof(m_action);
             return false;
         }
@@ -76,12 +71,12 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected amount of data in the buffer";
+            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer";
             rxBuffer.consume(rxBuffer.size());
             return false;
         }
 
-        BOOST_LOG_TRIVIAL(info) << "Decomposed message - type:" << m_header.getMessageType()
+        CLUSTER_LOG(info) << "Decomposed message - type:" << m_header.getMessageType()
                                 << " - LedAction:" << m_action;
 
         rxBuffer.consume(sizeof(END_OF_MESSAGE));

@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include "rapidxml.hpp"
 #include "Message_I.hpp"
 #include "MessageLed.hpp"
@@ -10,13 +9,7 @@
 
 namespace ClusterController
 {
-    //using namespace boost::property_tree::detail;
-
     DeviceManager* DeviceManager::spInstance = NULL;
-
-    DeviceManager::DeviceManager()
-    {
-    }
 
     DeviceManager* DeviceManager::getInstance()
     {
@@ -34,7 +27,7 @@ namespace ClusterController
 
         if(!file)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot open file: DeviceManager.xml";
+            CLUSTER_LOG(fatal) << "Cannot open file: DeviceManager.xml";
             return true;
         }
 
@@ -47,7 +40,7 @@ namespace ClusterController
 
         if(!root->first_node())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot parse XML file: DeviceManager.xml";
+            CLUSTER_LOG(fatal) << "Cannot parse XML file: DeviceManager.xml";
             return true;
         }
 
@@ -55,7 +48,7 @@ namespace ClusterController
 
         if(!cRoot)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot parse devices: DeviceManager.xml";
+            CLUSTER_LOG(fatal) << "Cannot parse devices: DeviceManager.xml";
             return true;
         }
         std::cout << "Reading XML configuration file...";
@@ -133,7 +126,7 @@ namespace ClusterController
         return m_devicesMap.find(m_myName)->second.second;       
     }
     
-    void DeviceManager::processReceivedMessage(std::unique_ptr<Message_I>& msg)
+    void DeviceManager::processReceivedMessage(std::shared_ptr<Message_I> msg)
     {
         if(msg->getMessageType() == e_MSG_LED)
         {
@@ -169,7 +162,4 @@ namespace ClusterController
         }
     }
 
-    DeviceManager::~DeviceManager()
-    {
-    }
 }

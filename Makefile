@@ -5,7 +5,7 @@ SRC = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 CPPFLAGS = -Iinclude
-CFLAGS = -c -std=c++11 -Wall -DBOOST_LOG_DYN_LINK
+CFLAGS = -c -std=c++14 -Wall -DBOOST_LOG_DYN_LINK
 LDLIBS = -lboost_system -lboost_thread -lpthread -lboost_log -lboost_log_setup -lwiringPi
 
 .PHONY: all clean

@@ -1,7 +1,6 @@
 #include "TcpConnection.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include <boost/lexical_cast.hpp>
 #include "MessageHeader.hpp"
 #include "MessageProcessor.hpp"
@@ -26,7 +25,7 @@ namespace ClusterController
     void TcpConnection::startServerConnection()
     {
         
-        BOOST_LOG_TRIVIAL(info) << "Connected to: " << boost::lexical_cast<std::string>(m_socket.remote_endpoint());
+        CLUSTER_LOG(info) << "Connected to: " << boost::lexical_cast<std::string>(m_socket.remote_endpoint());
 
         boost::asio::async_read_until(m_socket, m_rxBuffer, END_OF_MESSAGE,
                                 boost::bind(&TcpConnection::onRead, shared_from_this(),
@@ -39,11 +38,12 @@ namespace ClusterController
         if (!error)
         {
             assert(bytes_transferred < m_rxBuffer.size() && "Size of the info transferred is more than the buffer size");
-            BOOST_LOG_TRIVIAL(info) << "Received message [bytes transferred:" << bytes_transferred << "]";
+            CLUSTER_LOG(info) << "Received message [bytes transferred:" << bytes_transferred << "]";
 
             if(!MessageProcessor::processReceivedMessage(m_rxBuffer))
             {
                 //delete the buffer if the process failed
+                CLUSTER_LOG(info) << "Message process task failed";
                 m_rxBuffer.consume(m_rxBuffer.size());
             }
             
@@ -54,7 +54,7 @@ namespace ClusterController
         }
         else
         {
-            BOOST_LOG_TRIVIAL(error) << error.message();
+            CLUSTER_LOG(error) << error.message();
         }
 
         m_socket.close();

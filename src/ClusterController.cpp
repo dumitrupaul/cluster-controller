@@ -1,12 +1,13 @@
+#include "ClusterIncludes.hpp"
 #include "TcpServer.hpp"
 #include "LocalClient.hpp"
 #include "DeviceManager.hpp"
-#include <boost/thread.hpp>
+#include <thread>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/support/date_time.hpp>
 #include <wiringPi.h>
-
-#define COMMUNICATION_PORT 44444
 
 static void init_log()
 {
@@ -21,7 +22,12 @@ static void init_log()
       boost::log::keywords::rotation_size = 1 * 1024 * 1024,
       boost::log::keywords::max_size = 20 * 1024 * 1024,
       boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
-      boost::log::keywords::format = COMMON_FMT,
+      boost::log::keywords::format = (
+      boost::log::expressions::stream
+        << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+        << ": [" << boost::log::trivial::severity
+        << "] " << boost::log::expressions::smessage
+      ),
       boost::log::keywords::auto_flush = true);
 
   boost::log::add_common_attributes();
@@ -65,29 +71,6 @@ void handleServer()
   }
 }
 
-void myInterrupt()
-{
-  ClusterController::Features &f = ClusterController::DeviceManager::getInstance()->getMyFeatures();
-  if(f.findLed(17) != -1) 
-  {
-      pinMode(0, OUTPUT);
-      ClusterController::Led& l= f.getLedList()[f.findLed(17)];
-      if(l.status)
-      {
-          l.status = false;
-          digitalWrite(0, LOW);
-          BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned OFF.";
-      }
-      else
-      {
-          l.status = true;
-          digitalWrite(0, HIGH);
-          BOOST_LOG_TRIVIAL(info) << "Led on pin:" << l.pinNumber << " has been turned ON.";
-      }
-  }
-  
-}
-
 int main(int argc, char* argv[])
 {
   bool autoMode = false;
@@ -114,8 +97,8 @@ int main(int argc, char* argv[])
   
   wiringPiSetup();
   
-  boost::thread CLIENTthread(boost::bind(&handleClient, autoMode));
-  boost::thread SERVERthread(&handleServer);
+  std::thread CLIENTthread(std::bind(&handleClient, autoMode));
+  std::thread SERVERthread(&handleServer);
   SERVERthread.join();
   CLIENTthread.join();
 

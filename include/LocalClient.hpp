@@ -1,5 +1,6 @@
 #ifndef LOCALCLIENT_HPP
 #define LOCALCLIENT_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
 #include <vector>
 #include "Features.hpp"

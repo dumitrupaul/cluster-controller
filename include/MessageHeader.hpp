@@ -1,9 +1,7 @@
 #ifndef MESSAGEHEADER_HPP
 #define MESSAGEHEADER_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
-
-#define MAX_MSG_SIZE 256
-#define END_OF_MESSAGE "DEADBEEF"
 
 namespace ClusterController
 {
@@ -18,9 +16,11 @@ namespace ClusterController
     class MessageHeader
     {
         public:
-            const uint32_t headerLength = 40U;
+            static const uint32_t cHeaderLength = 40;
             
-            MessageHeader();
+            MessageHeader() = default;
+
+            MessageHeader(MessageType msgType);
 
             MessageHeader(const MessageHeader& header);
 
@@ -40,12 +40,12 @@ namespace ClusterController
 
             void setLength(uint32_t len);
 
-            ~MessageHeader();
+            ~MessageHeader() = default;
 
         private:
-            char ipAddress[32];
-            MessageType type;
-            uint32_t length;
+            char mIpAddress[32];
+            MessageType mType;
+            uint32_t mLength;
     };
 }
 

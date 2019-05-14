@@ -2,26 +2,24 @@
 #include "MessagePing.hpp"
 #include "MessageLed.hpp"
 #include "DeviceManager.hpp"
-#include <boost/log/trivial.hpp>
-#include <boost/make_unique.hpp>
 #include <iostream>
 
 namespace ClusterController
 {
     bool MessageProcessor::processReceivedMessage(boost::asio::streambuf& rxBuffer)
     {
-        MessageHeader m_recvMsgHeader;
-        std::unique_ptr<Message_I> msg;
-
-        if(m_recvMsgHeader.decodeHeader(rxBuffer))
+        MessageHeader recvMsgHeader;
+        
+        if(recvMsgHeader.decodeHeader(rxBuffer))
         {
-            if(!createMessageFromType(m_recvMsgHeader.getMessageType(), msg, false))
+            std::unique_ptr<Message_I> msg = createMessageFromType(recvMsgHeader.getMessageType(), false);
+            if(!msg)
                 return false;
             
-            msg->decomposeMessage(rxBuffer);
+            if(!msg->decomposeMessage(recvMsgHeader, rxBuffer))
+                return false;
             
-            BOOST_LOG_TRIVIAL(info) << msg->getMessageType();
-            DeviceManager::getInstance()->processReceivedMessage(msg);
+            DeviceManager::getInstance()->processReceivedMessage(std::move(msg));
         }
         else
         {
@@ -34,9 +32,9 @@ namespace ClusterController
     bool MessageProcessor::processSentMessageType(boost::asio::streambuf& txBuffer, uint32_t msgType)
     {
         MessageType e_msgType = static_cast<MessageType>(msgType);
-        std::unique_ptr<Message_I> msg;
+        std::unique_ptr<Message_I> msg = createMessageFromType(e_msgType, true);
 
-        if(!createMessageFromType(e_msgType, msg, true))
+        if(!msg)
             return false;
 
         msg->readAdditionalVariables();
@@ -46,7 +44,7 @@ namespace ClusterController
         return true;
     }
     
-    bool MessageProcessor::processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I>& msg)
+    bool MessageProcessor::processSentMessagePtr(boost::asio::streambuf& txBuffer, std::shared_ptr<Message_I> msg)
     {
         if(!msg->mouldMessage(txBuffer))
             return false;
@@ -54,28 +52,29 @@ namespace ClusterController
         return true;
     }
 
-    bool MessageProcessor::createMessageFromType(MessageType msgType, std::unique_ptr<Message_I>& msg, bool logType)
+    std::unique_ptr<Message_I> MessageProcessor::createMessageFromType(MessageType msgType, bool logType)
     {
+        std::unique_ptr<Message_I> msg;
         switch (msgType)
         {
             case e_MSG_PING:
-                msg = boost::make_unique<MessagePing>();
+                msg = std::unique_ptr<Message_I>(new MessagePing());
                 break;
             case e_MSG_LED:
-                msg = boost::make_unique<MessageLed>();
+                msg = std::unique_ptr<Message_I>(new MessageLed());
                 break;
             default:
             {
                 if(logType == true)
                     std::cout << "Invalid message type entered.\n";
                 else 
-                    BOOST_LOG_TRIVIAL(error) << "Invalid message type received. Discarding.";
-                return false;
+                    CLUSTER_LOG(error) << "Invalid message type received. Discarding.";
+                return nullptr;
                 break;
             }
         }
 
-        return true;
+        return msg;
     }
 
 }

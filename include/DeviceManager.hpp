@@ -1,5 +1,6 @@
 #ifndef DEVICEMANAGER_HPP
 #define DEVICEMANAGER_HPP
+#include "ClusterIncludes.hpp"
 #include <map>
 #include <boost/asio.hpp>
 #include "Features.hpp"
@@ -14,7 +15,7 @@ namespace ClusterController
 
             bool loadDevices();
             
-            void processReceivedMessage(std::unique_ptr<Message_I>& msg);
+            void processReceivedMessage(std::shared_ptr<Message_I> msg);
 
             std::vector<std::string> getNames();
 
@@ -28,9 +29,9 @@ namespace ClusterController
             //useful for debug
             void printDeviceMap();
 
-            DeviceManager();
+            DeviceManager() = default;
 
-            ~DeviceManager();
+            ~DeviceManager() = default;
 
             static DeviceManager* spInstance;
             std::string m_myIpAddress;

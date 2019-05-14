@@ -1,29 +1,20 @@
 #include "MessagePing.hpp"
 #include "DeviceManager.hpp"
 #include <iostream>
-#include <boost/log/trivial.hpp>
 
 namespace ClusterController
 {
-    MessagePing::MessagePing()
+    MessagePing::MessagePing() : m_header(e_MSG_PING)
     {
-        m_header.setMessageType(e_MSG_PING);
-        char ipAddress[32];
-        strcpy(ipAddress, DeviceManager::getInstance()->getMyIpAddress().c_str());
-        m_header.setIpAddress(ipAddress);
     }
 
     MessagePing::MessagePing(const MessageHeader& header) : m_header(header)
     {
     }
 
-    MessagePing::~MessagePing()
-    {
-    }
-
     bool MessagePing::mouldMessage(boost::asio::streambuf& txBuffer)
     {
-        m_header.setLength(m_header.headerLength + sizeof(END_OF_MESSAGE));
+        m_header.setLength(m_header.getLength() + sizeof(END_OF_MESSAGE));
 
         txBuffer.consume(txBuffer.size());
 
@@ -44,13 +35,15 @@ namespace ClusterController
         return true;
     }
 
-    bool MessagePing::decomposeMessage(boost::asio::streambuf& rxBuffer)
+    bool MessagePing::decomposeMessage(MessageHeader msgHeader, boost::asio::streambuf& rxBuffer)
     {
-        BOOST_LOG_TRIVIAL(info) << "Decomposed message - type:" << m_header.getMessageType() ;
+        m_header = msgHeader;
+        
+        CLUSTER_LOG(info) << "Decomposed message - type:" << m_header.getMessageType() ;
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected amount of data in the buffer";
+            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer";
             rxBuffer.consume(rxBuffer.size());
             return false;
         }

@@ -1,5 +1,6 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
 #include "Message_I.hpp"
 
@@ -15,13 +16,13 @@ namespace ClusterController
 
             virtual bool mouldMessage(boost::asio::streambuf& m_txBuffer);
 
-            virtual bool decomposeMessage(boost::asio::streambuf& m_rxBuffer);
+            virtual bool decomposeMessage(MessageHeader msgHeader, boost::asio::streambuf& m_rxBuffer);
 
             virtual void readAdditionalVariables();
 
             virtual MessageType getMessageType() const;
 
-            ~MessagePing();
+            virtual ~MessagePing() = default;
 
         private:
             MessageHeader m_header;
