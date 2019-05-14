@@ -19,7 +19,7 @@ namespace ClusterController
         txBuffer.consume(txBuffer.size());
 
         m_header.encodeHeader(txBuffer);
-
+        
         txBuffer.commit(boost::asio::buffer_copy(txBuffer.prepare(sizeof(END_OF_MESSAGE)),
                             boost::asio::buffer(&(END_OF_MESSAGE),sizeof(END_OF_MESSAGE))));
 
@@ -43,7 +43,7 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            CLUSTER_LOG(fatal) << __FILE__ << __LINE__ << "Unexpected amount of data in the buffer: " << rxBuffer.size();
+            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer";
             rxBuffer.consume(rxBuffer.size());
             return false;
         }
@@ -53,7 +53,7 @@ namespace ClusterController
         return true;
     }
 
-    MessageType MessagePing::getMessageType()
+    MessageType MessagePing::getMessageType() const
     {
         return m_header.getMessageType();
     }

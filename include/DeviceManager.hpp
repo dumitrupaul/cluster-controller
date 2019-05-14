@@ -14,12 +14,16 @@ namespace ClusterController
             static DeviceManager* getInstance();
 
             bool loadDevices();
+            
+            void processReceivedMessage(std::shared_ptr<Message_I> msg);
 
             std::vector<std::string> getNames();
 
             boost::asio::ip::address getIPfromName(std::string& name) const;
 
             const std::string& getMyIpAddress() const;
+            
+            Features& getMyFeatures();
 
         private:
             //useful for debug
@@ -30,8 +34,9 @@ namespace ClusterController
             ~DeviceManager() = default;
 
             static DeviceManager* spInstance;
-            std::string mMyIpAddress;
-            std::map<std::string, td_device> mDevicesMap;  
+            std::string m_myIpAddress;
+            std::string m_myName;
+            std::map<std::string, td_device> m_devicesMap;  
     };
 }
 
