@@ -1,5 +1,6 @@
 #ifndef DEVICEMANAGER_HPP
 #define DEVICEMANAGER_HPP
+#include "ClusterIncludes.hpp"
 #include <map>
 #include <boost/asio.hpp>
 #include "Features.hpp"

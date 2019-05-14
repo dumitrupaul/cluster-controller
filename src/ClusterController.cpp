@@ -1,11 +1,12 @@
+#include "ClusterIncludes.hpp"
 #include "TcpServer.hpp"
 #include "LocalClient.hpp"
 #include "DeviceManager.hpp"
 #include <thread>
-#include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup.hpp>
-
-#define COMMUNICATION_PORT 44444
+#include <boost/log/keywords/format.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/support/date_time.hpp>
 
 static void init_log()
 {
@@ -20,8 +21,14 @@ static void init_log()
       boost::log::keywords::rotation_size = 1 * 1024 * 1024,
       boost::log::keywords::max_size = 20 * 1024 * 1024,
       boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
-      boost::log::keywords::format = COMMON_FMT,
+      boost::log::keywords::format = (
+		  boost::log::expressions::stream
+			  << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+			  << ": [" << boost::log::trivial::severity
+			  << "] " << boost::log::expressions::smessage
+	    ),
       boost::log::keywords::auto_flush = true);
+  
 
   boost::log::add_common_attributes();
 

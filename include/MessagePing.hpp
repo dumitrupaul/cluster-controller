@@ -1,7 +1,7 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
-#include "MessageHeader.hpp"
 #include "Message_I.hpp"
 
 namespace ClusterController
@@ -16,7 +16,7 @@ namespace ClusterController
 
             virtual bool mouldMessage(boost::asio::streambuf& m_txBuffer);
 
-            virtual bool decomposeMessage(boost::asio::streambuf& m_rxBuffer);
+            virtual bool decomposeMessage(MessageHeader msgHeader, boost::asio::streambuf& m_rxBuffer);
 
             virtual void readAdditionalVariables();
 

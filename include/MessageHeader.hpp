@@ -1,9 +1,7 @@
 #ifndef MESSAGEHEADER_HPP
 #define MESSAGEHEADER_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
-
-#define MAX_MSG_SIZE 256
-#define END_OF_MESSAGE "DEADBEEF"
 
 namespace ClusterController
 {

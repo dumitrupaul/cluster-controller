@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include "rapidxml.hpp"
 
 namespace ClusterController
@@ -25,7 +24,7 @@ namespace ClusterController
 
         if(!file)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot open file: DeviceManager.xml";
+            CLUSTER_LOG(fatal) << "Cannot open file: DeviceManager.xml";
             return true;
         }
 
@@ -38,7 +37,7 @@ namespace ClusterController
 
         if(!root->first_node())
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot parse XML file: DeviceManager.xml";
+            CLUSTER_LOG(fatal) << "Cannot parse XML file: DeviceManager.xml";
             return true;
         }
 
@@ -46,7 +45,7 @@ namespace ClusterController
 
         if(!cRoot)
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot parse devices: DeviceManager.xml";
+            CLUSTER_LOG(fatal) << "Cannot parse devices: DeviceManager.xml";
             return true;
         }
         std::cout << "Reading XML configuration file...";

@@ -1,5 +1,6 @@
 #ifndef MESSAGEPROCESSOR_HPP
 #define MESSAGEPROCESSOR_HPP
+#include "ClusterIncludes.hpp"
 #include <boost/asio.hpp>
 #include "MessageHeader.hpp"
 

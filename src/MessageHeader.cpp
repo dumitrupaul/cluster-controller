@@ -1,6 +1,5 @@
 #include "MessageHeader.hpp"
 #include "DeviceManager.hpp"
-#include <boost/log/trivial.hpp>
 
 namespace ClusterController
 {
@@ -33,7 +32,7 @@ namespace ClusterController
         mType = *reinterpret_cast<MessageType const*>(buf + sizeof(mIpAddress));
         mLength = *reinterpret_cast<uint32_t const*>(buf + sizeof(mIpAddress) + sizeof(mType));
 
-        BOOST_LOG_TRIVIAL(info) << "Decoded header - ipAddress: " << mIpAddress
+        CLUSTER_LOG(info) << "Decoded header - ipAddress: " << mIpAddress
                                 << " - type:" << mType << " - len: " << mLength;
 
         return true;

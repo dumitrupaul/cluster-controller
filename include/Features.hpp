@@ -1,5 +1,6 @@
 #ifndef FEATURES_HPP
 #define FEATURES_HPP
+#include "ClusterIncludes.hpp"
 #include <vector>
 #include <boost/asio.hpp>
 

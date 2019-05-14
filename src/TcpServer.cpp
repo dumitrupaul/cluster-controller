@@ -1,6 +1,5 @@
 #include "TcpServer.hpp"
 #include <boost/bind.hpp>
-#include <boost/log/trivial.hpp>
 #include <iostream>
 
 namespace ClusterController
@@ -38,7 +37,7 @@ namespace ClusterController
         if (error)
         {
             // An error occurred.
-            BOOST_LOG_TRIVIAL(error) << "Can't get local IP Address";
+            CLUSTER_LOG(error) << "Can't get local IP Address";
             return nullptr;
         }
 

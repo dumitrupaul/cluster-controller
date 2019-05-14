@@ -1,22 +1,22 @@
 #include "MessageProcessor.hpp"
 #include "MessagePing.hpp"
 #include "MessageLed.hpp"
-#include <boost/log/trivial.hpp>
 #include <iostream>
 
 namespace ClusterController
 {
     bool MessageProcessor::processReceivedMessage(boost::asio::streambuf& rxBuffer)
     {
-        MessageHeader m_recvMsgHeader;
+        MessageHeader recvMsgHeader;
         
-        if(m_recvMsgHeader.decodeHeader(rxBuffer))
+        if(recvMsgHeader.decodeHeader(rxBuffer))
         {
-            std::unique_ptr<Message_I> msg = createMessageFromType(m_recvMsgHeader.getMessageType(), false);
+            std::unique_ptr<Message_I> msg = createMessageFromType(recvMsgHeader.getMessageType(), false);
             if(!msg)
                 return false;
             
-            msg->decomposeMessage(rxBuffer);
+            if(!msg->decomposeMessage(recvMsgHeader, rxBuffer))
+                return false;
         }
         else
         {
@@ -35,7 +35,8 @@ namespace ClusterController
             return false;
 
         msg->readAdditionalVariables();
-        msg->mouldMessage(txBuffer);
+        if(!msg->mouldMessage(txBuffer))
+            return false;
 
         return true;
     }
@@ -56,7 +57,7 @@ namespace ClusterController
                 if(logType == true)
                     std::cout << "Invalid message type entered.\n";
                 else 
-                    BOOST_LOG_TRIVIAL(error) << "Invalid message type received. Discarding.";
+                    CLUSTER_LOG(error) << "Invalid message type received. Discarding.";
                 return nullptr;
                 break;
             }

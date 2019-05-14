@@ -1,7 +1,6 @@
 #include "MessagePing.hpp"
 #include "DeviceManager.hpp"
 #include <iostream>
-#include <boost/log/trivial.hpp>
 
 namespace ClusterController
 {
@@ -36,13 +35,15 @@ namespace ClusterController
         return true;
     }
 
-    bool MessagePing::decomposeMessage(boost::asio::streambuf& rxBuffer)
+    bool MessagePing::decomposeMessage(MessageHeader msgHeader, boost::asio::streambuf& rxBuffer)
     {
-        BOOST_LOG_TRIVIAL(info) << "Decomposed message - type:" << m_header.getMessageType() ;
+        m_header = msgHeader;
+        
+        CLUSTER_LOG(info) << "Decomposed message - type:" << m_header.getMessageType() ;
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            BOOST_LOG_TRIVIAL(fatal) << __FILE__ << __LINE__ << "Unexpected amount of data in the buffer: " << rxBuffer.size();
+            CLUSTER_LOG(fatal) << __FILE__ << __LINE__ << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
         }

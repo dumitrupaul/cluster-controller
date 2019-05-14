@@ -1,6 +1,5 @@
 #include "MessageLed.hpp"
 #include <iostream>
-#include <boost/log/trivial.hpp>
 
 namespace ClusterController
 {
@@ -41,14 +40,16 @@ namespace ClusterController
         return true;
     }
 
-    bool MessageLed::decomposeMessage(boost::asio::streambuf& rxBuffer)
+    bool MessageLed::decomposeMessage(MessageHeader msgHeader, boost::asio::streambuf& rxBuffer)
     {
+        m_header = msgHeader;
+        
         std::istream is(&rxBuffer);
         char buf[MAX_MSG_SIZE - m_header.getLength()];
 
         if(!is)
         {
-            BOOST_LOG_TRIVIAL(info) << "Could not open stream from buffer";
+            CLUSTER_LOG(info) << "Could not open stream from buffer";
             rxBuffer.consume(rxBuffer.size());
             return false;
         }
@@ -56,7 +57,7 @@ namespace ClusterController
         is.read(buf, sizeof(m_action));
         if(!is) 
         {
-            BOOST_LOG_TRIVIAL(info) << "Buffer failure while decomposing message only "
+            CLUSTER_LOG(info) << "Buffer failure while decomposing message only "
                                     << is.gcount() << " bytes could be read, instead of " << sizeof(m_action);
             rxBuffer.consume(rxBuffer.size());
             return false;
@@ -66,12 +67,12 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected amount of data in the buffer: " << rxBuffer.size();
+            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
         }
 
-        BOOST_LOG_TRIVIAL(info) << "Decomposed message - type:" << m_header.getMessageType()
+        CLUSTER_LOG(info) << "Decomposed message - type:" << m_header.getMessageType()
                                 << " - LedAction:" << m_action;
 
         rxBuffer.consume(sizeof(END_OF_MESSAGE));

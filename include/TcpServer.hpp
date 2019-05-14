@@ -1,5 +1,6 @@
 #ifndef TCPSERVER_HPP
 #define TCPSERVER_HPP
+#include "ClusterIncludes.hpp"
 #include "TcpConnection.hpp"
 
 namespace ClusterController
