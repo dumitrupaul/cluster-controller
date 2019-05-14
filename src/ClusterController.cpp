@@ -5,6 +5,7 @@
 #include <thread>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup.hpp>
+#include <boost/log/keywords/format.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <wiringPi.h>
@@ -29,6 +30,7 @@ static void init_log()
         << "] " << boost::log::expressions::smessage
       ),
       boost::log::keywords::auto_flush = true);
+  
 
   boost::log::add_common_attributes();
 
@@ -97,10 +99,11 @@ int main(int argc, char* argv[])
   
   wiringPiSetup();
   
-  std::thread CLIENTthread(std::bind(&handleClient, autoMode));
-  std::thread SERVERthread(&handleServer);
-  SERVERthread.join();
-  CLIENTthread.join();
+  std::thread ClientThread(&handleClient);
+  std::thread ServerThread(&handleServer);
+  ServerThread.join();
+  ClientThread.join();
+
 
   return EXIT_SUCCESS;
 }

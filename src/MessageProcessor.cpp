@@ -2,6 +2,7 @@
 #include "MessagePing.hpp"
 #include "MessageLed.hpp"
 #include "DeviceManager.hpp"
+
 #include <iostream>
 
 namespace ClusterController

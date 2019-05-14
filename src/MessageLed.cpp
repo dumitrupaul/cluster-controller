@@ -1,5 +1,4 @@
 #include "MessageLed.hpp"
-#include "DeviceManager.hpp"
 #include <iostream>
 
 namespace ClusterController
@@ -20,6 +19,7 @@ namespace ClusterController
     {
         m_action = ledAct;
     }
+
 
     bool MessageLed::mouldMessage(boost::asio::streambuf& txBuffer)
     {
@@ -56,6 +56,8 @@ namespace ClusterController
         if(!is)
         {
             CLUSTER_LOG(info) << "Could not open stream from buffer";
+            rxBuffer.consume(rxBuffer.size());
+
             return false;
         }
 
@@ -64,6 +66,7 @@ namespace ClusterController
         {
             CLUSTER_LOG(info) << "Buffer failure while decomposing message only "
                                     << is.gcount() << " bytes could be read, instead of " << sizeof(m_action);
+            rxBuffer.consume(rxBuffer.size());
             return false;
         }
 
@@ -71,7 +74,8 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer";
+
+            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
         }
