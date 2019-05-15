@@ -5,11 +5,11 @@
             <currentDevice/>
             <led pin="0"/>
             <button pin="1">
-                <connection>172.27.0.1</connection>
+                <connection>172.27.0.3</connection>
                 <onPressSend>MSG_PING</onPressSend>
             </button>
             <button pin="2">
-                <connection>172.27.0.2</connection>
+                <connection>172.27.0.1</connection>
                 <onPressSend>MSG_LED_TOGGLE</onPressSend>
             </button>
         </device>

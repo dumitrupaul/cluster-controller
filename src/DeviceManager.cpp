@@ -83,7 +83,7 @@ namespace ClusterController
                 }
             }
 
-            mDevicesMap.insert(std::make_pair(name, td_device(boost::asio::ip::address::from_string(ipAddress), feature)));
+            m_devicesMap.insert(std::make_pair(name, td_device(boost::asio::ip::address::from_string(ipAddress), feature)));
         }
         std::cout << "..............Done." << std::endl;
         //printDeviceMap();
@@ -92,7 +92,7 @@ namespace ClusterController
 
     void DeviceManager::printDeviceMap()
     {
-        for(std::map<std::string,td_device>::iterator it = mDevicesMap.begin(); it != mDevicesMap.end(); ++it) 
+        for(std::map<std::string,td_device>::iterator it = m_devicesMap.begin(); it != m_devicesMap.end(); ++it) 
         {
             std::cout << it->first <<" : " << it->second.first.to_string() << std::endl;
             it->second.second.printFeatures();
@@ -103,7 +103,7 @@ namespace ClusterController
     {
         std::vector<std::string> names;
 
-        for(std::map<std::string,td_device>::iterator it = mDevicesMap.begin(); it != mDevicesMap.end(); ++it) 
+        for(std::map<std::string,td_device>::iterator it = m_devicesMap.begin(); it != m_devicesMap.end(); ++it) 
         {
             names.push_back(it->first);
         }
@@ -113,12 +113,12 @@ namespace ClusterController
 
     boost::asio::ip::address DeviceManager::getIPfromName(std::string& name) const
     {
-        return mDevicesMap.find(name)->second.first;
+        return m_devicesMap.find(name)->second.first;
     }
 
     const std::string& DeviceManager::getMyIpAddress() const
     {
-        return mMyIpAddress;
+        return m_myIpAddress;
     }
     
     Features& DeviceManager::getMyFeatures()

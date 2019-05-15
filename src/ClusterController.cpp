@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
   
   wiringPiSetup();
   
-  std::thread ClientThread(&handleClient);
+  std::thread ClientThread(std::bind(&handleClient, autoMode));
   std::thread ServerThread(&handleServer);
   ServerThread.join();
   ClientThread.join();

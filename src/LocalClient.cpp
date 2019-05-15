@@ -148,9 +148,11 @@ namespace ClusterController
         { 
             if(digitalRead(buttons[buttonIdx].pinNumber) == LOW)
             {
+                sentMessageTimeInMs = millis();
+                
                 if(!MessageProcessor::processSentMessagePtr(m_txBuffer, buttons[buttonIdx].sendMsg))
                     return false;
-                sentMessageTimeInMs = millis();
+                
                 m_ipAddress = buttons[buttonIdx].conn;
                 return true;
             }
