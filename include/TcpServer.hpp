@@ -13,6 +13,8 @@ namespace ClusterController
     public:
         TcpServer(boost::asio::io_service &io_service, int serverPort);
 
+        ~TcpServer() = default;
+
     private:
         void startAccept();
 

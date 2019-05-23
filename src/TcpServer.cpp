@@ -6,7 +6,7 @@ namespace ClusterController
 {
 
     TcpServer::TcpServer(boost::asio::io_service &io_service, int serverPort) : 
-                        serverAcceptor(io_service, tcp::endpoint(tcp::v4(), serverPort)),
+                        serverAcceptor(io_service, tcp::endpoint(tcp::v4(), COMMUNICATION_PORT)),
                         mContext(boost::asio::ssl::context::sslv23)
     {
         mContext.set_options(
@@ -40,7 +40,9 @@ namespace ClusterController
         {
             newConn->startHandshake();
         }
-
+        
+        //newConn->getSocket().lowest_layer().close();
+        
         startAccept();
     }
 

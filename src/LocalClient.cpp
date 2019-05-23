@@ -9,10 +9,12 @@ namespace ClusterController
 {
 
     LocalClient::LocalClient(boost::asio::io_service &io_service, boost::asio::ssl::context& context) : 
+                            m_serverPort(COMMUNICATION_PORT),
                             m_socket(io_service, context)
     {
         m_socket.set_verify_mode(boost::asio::ssl::verify_peer);
         m_socket.set_verify_callback(std::bind(&LocalClient::verifyCertificate, this, std::placeholders::_1, std::placeholders::_2));
+
         startConnection();
     }
 
@@ -57,7 +59,11 @@ namespace ClusterController
                 std::cout << "Couldn't connect in time. Make sure batman-adv is properly configured "
                                 "and the device is connected to the mesh: ";
             std::cout << error.message() << std::endl;
-            //m_socket.close();
+
+            m_socket.lowest_layer().close();
+            // m_socket.async_shutdown([this](...){
+            //     m_socket.lowest_layer().close();
+            // });
             startConnection();
         }
     }
@@ -67,15 +73,15 @@ namespace ClusterController
         m_socket.async_handshake(boost::asio::ssl::stream_base::client,
             [this](const boost::system::error_code& error)
             {
-            if (!error)
-            {
-                std::cout << "Handshake succeeded. Sending message...\n";
-                writeMessage();
-            }
-            else
-            {
-                std::cout << "Handshake failed: " << error.message() << "\n";
-            }
+                if (!error)
+                {
+                    std::cout << "Handshake succeeded. Sending message...\n";
+                    writeMessage();
+                }
+                else
+                {
+                    std::cout << "Handshake failed: " << error.message() << "\n";
+                }
             });
     }
 
@@ -95,11 +101,14 @@ namespace ClusterController
         }
         else
         {
-            std::cout << error.message() << std::endl;
+            std::cout << "Can't write message, reason: " << error.message() << std::endl;
         }
 
         //close the socket after every message sent
-        //m_socket.close();
+        m_socket.lowest_layer().close();
+        // m_socket.async_shutdown([this](...){
+        //     m_socket.lowest_layer().close();
+        // });
         startConnection();
     }
 

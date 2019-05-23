@@ -25,6 +25,8 @@ namespace ClusterController
 
         void startHandshake();
 
+        ~TcpConnection() = default;
+
     private:
         TcpConnection(boost::asio::io_service &io_service, boost::asio::ssl::context& context);
 

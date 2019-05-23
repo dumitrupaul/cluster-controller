@@ -24,14 +24,19 @@ namespace ClusterController
 
     void TcpConnection::startHandshake()
     {
+        CLUSTER_LOG(info) << "Starting new handshake";
         auto self(shared_from_this());
         m_socket.async_handshake(boost::asio::ssl::stream_base::server, 
         [this, self](const boost::system::error_code& error)
         {
-          if (!error)
-          {
+            if (!error)
+            {
             startServerConnection();
-          }
+            }
+            else
+            {
+            CLUSTER_LOG(error) << "Handshake failed reason: " << error.message();
+            }
         });
 
     }
@@ -69,7 +74,11 @@ namespace ClusterController
         {
             CLUSTER_LOG(error) << error.message();
         }
-
-        //m_socket.close();
+        auto self(shared_from_this());
+        m_socket.async_shutdown([this, self](...){
+            m_socket.lowest_layer().close();
+        });
+        
     }
+
 }
