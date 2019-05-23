@@ -43,7 +43,7 @@ namespace ClusterController
 
         if(rxBuffer.size() != sizeof(END_OF_MESSAGE))
         {
-            CLUSTER_LOG(fatal) << __FILE__ << __LINE__ << "Unexpected amount of data in the buffer: " << rxBuffer.size();
+            CLUSTER_LOG(fatal) << "Unexpected amount of data in the buffer: " << rxBuffer.size();
             rxBuffer.consume(rxBuffer.size());
             return false;
         }

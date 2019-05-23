@@ -45,7 +45,10 @@ void handleClient()
   {
     boost::asio::io_service io_service;
 
-    ClusterController::LocalClient client(io_service, COMMUNICATION_PORT);
+    boost::asio::ssl::context ctx(boost::asio::ssl::context::sslv23);
+    ctx.load_verify_file("rootca.crt");
+
+    ClusterController::LocalClient client(io_service, ctx);
 
     io_service.run();
   }

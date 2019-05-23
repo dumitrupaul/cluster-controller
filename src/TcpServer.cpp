@@ -6,16 +6,30 @@ namespace ClusterController
 {
 
     TcpServer::TcpServer(boost::asio::io_service &io_service, int serverPort) : 
-                        serverAcceptor(io_service, tcp::endpoint(tcp::v4(), serverPort))
+                        serverAcceptor(io_service, tcp::endpoint(tcp::v4(), serverPort)),
+                        mContext(boost::asio::ssl::context::sslv23)
     {
+        mContext.set_options(
+            boost::asio::ssl::context::default_workarounds
+            | boost::asio::ssl::context::no_sslv2
+            | boost::asio::ssl::context::single_dh_use);
+        mContext.set_password_callback(std::bind(&TcpServer::getPassword, this));
+        mContext.use_certificate_chain_file("user.crt");
+        mContext.use_private_key_file("user.key", boost::asio::ssl::context::pem);
+        mContext.use_tmp_dh_file("dh2048.pem");
         startAccept();
+    }
+
+    std::string TcpServer::getPassword() const
+    {
+        return "jamez";
     }
 
     void TcpServer::startAccept()
     {
-        TcpConnection::td_tcpConnPointer newConn = TcpConnection::create(serverAcceptor.get_io_service());
+        TcpConnection::td_tcpConnPointer newConn = TcpConnection::create(serverAcceptor.get_io_service(), mContext);
 
-        serverAcceptor.async_accept(newConn->getSocket(),
+        serverAcceptor.async_accept(newConn->getSocket().lowest_layer(),
                                     boost::bind(&TcpServer::onAccept, this, newConn,
                                                 boost::asio::placeholders::error));
     }
@@ -24,7 +38,7 @@ namespace ClusterController
     {
         if (!error)
         {
-            newConn->startServerConnection();
+            newConn->startHandshake();
         }
 
         startAccept();

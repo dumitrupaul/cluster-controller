@@ -4,7 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
-
+#include <boost/asio/ssl.hpp>
 
 namespace ClusterController
 {
@@ -17,18 +17,20 @@ namespace ClusterController
     public:
         typedef boost::shared_ptr<TcpConnection> td_tcpConnPointer;
 
-        static td_tcpConnPointer create(boost::asio::io_service &io_service);
+        static td_tcpConnPointer create(boost::asio::io_service &io_service, boost::asio::ssl::context& context);
 
-        tcp::socket &getSocket();
+        boost::asio::ssl::stream<tcp::socket> &getSocket();
 
         void startServerConnection();
 
+        void startHandshake();
+
     private:
-        TcpConnection(boost::asio::io_service &io_service);
+        TcpConnection(boost::asio::io_service &io_service, boost::asio::ssl::context& context);
 
         void onRead(const boost::system::error_code &error, size_t bytes_transferred);
 
-        tcp::socket m_socket;
+        boost::asio::ssl::stream<tcp::socket> m_socket;
         boost::asio::streambuf m_rxBuffer;
     };
 }

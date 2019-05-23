@@ -8,24 +8,37 @@
 namespace ClusterController
 {
 
-    TcpConnection::TcpConnection(boost::asio::io_service &io_service) : m_socket(io_service)
+    TcpConnection::TcpConnection(boost::asio::io_service &io_service, boost::asio::ssl::context& context) : m_socket(io_service, context)
     {
     }
 
-    TcpConnection::td_tcpConnPointer TcpConnection::create(boost::asio::io_service &io_service)
+    TcpConnection::td_tcpConnPointer TcpConnection::create(boost::asio::io_service &io_service, boost::asio::ssl::context& context)
     {
-        return td_tcpConnPointer(new TcpConnection(io_service));
+        return td_tcpConnPointer(new TcpConnection(io_service, context));
     }
 
-    tcp::socket &TcpConnection::getSocket()
+    boost::asio::ssl::stream<tcp::socket> &TcpConnection::getSocket()
     {
         return m_socket;
     }
 
+    void TcpConnection::startHandshake()
+    {
+        auto self(shared_from_this());
+        m_socket.async_handshake(boost::asio::ssl::stream_base::server, 
+        [this, self](const boost::system::error_code& error)
+        {
+          if (!error)
+          {
+            startServerConnection();
+          }
+        });
+
+    }
     void TcpConnection::startServerConnection()
     {
         
-        CLUSTER_LOG(info) << "Connected to: " << boost::lexical_cast<std::string>(m_socket.remote_endpoint());
+        CLUSTER_LOG(info) << "Connected to: " << boost::lexical_cast<std::string>(m_socket.lowest_layer().remote_endpoint());
 
         boost::asio::async_read_until(m_socket, m_rxBuffer, END_OF_MESSAGE,
                                 boost::bind(&TcpConnection::onRead, shared_from_this(),
@@ -57,6 +70,6 @@ namespace ClusterController
             CLUSTER_LOG(error) << error.message();
         }
 
-        m_socket.close();
+        //m_socket.close();
     }
 }

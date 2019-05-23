@@ -8,11 +8,30 @@
 namespace ClusterController
 {
 
-    LocalClient::LocalClient(boost::asio::io_service &io_service, int serverPort) : 
-                            m_serverPort(serverPort), 
-                            m_socket(io_service)
+    LocalClient::LocalClient(boost::asio::io_service &io_service, boost::asio::ssl::context& context) : 
+                            m_socket(io_service, context)
     {
+        m_socket.set_verify_mode(boost::asio::ssl::verify_peer);
+        m_socket.set_verify_callback(std::bind(&LocalClient::verifyCertificate, this, std::placeholders::_1, std::placeholders::_2));
         startConnection();
+    }
+
+    bool LocalClient::verifyCertificate(bool preverified, boost::asio::ssl::verify_context& ctx)
+    {
+        // The verify callback can be used to check whether the certificate that is
+        // being presented is valid for the peer. For example, RFC 2818 describes
+        // the steps involved in doing this for HTTPS. Consult the OpenSSL
+        // documentation for more details. Note that the callback is called once
+        // for each certificate in the certificate chain, starting from the root
+        // certificate authority.
+
+        // In this example we will simply print the certificate's subject name.
+        char subject_name[256];
+        X509* cert = X509_STORE_CTX_get_current_cert(ctx.native_handle());
+        X509_NAME_oneline(X509_get_subject_name(cert), subject_name, 256);
+        std::cout << "Verifying " << subject_name << "\n";
+
+        return preverified;
     }
 
     void LocalClient::startConnection()
@@ -20,7 +39,7 @@ namespace ClusterController
         handleInput();
 
         tcp::endpoint endPoint(m_ipAddress, m_serverPort);
-        m_socket.async_connect(endPoint, boost::bind(&LocalClient::onConnect, this, boost::asio::placeholders::error));
+        m_socket.lowest_layer().async_connect(endPoint, boost::bind(&LocalClient::onConnect, this, boost::asio::placeholders::error));
     }
 
     void LocalClient::onConnect(const boost::system::error_code &error)
@@ -28,7 +47,8 @@ namespace ClusterController
         if (!error)
         {
             //connection succeeded
-            writeMessage();
+            std::cout << "Connection from the client succeeded. Starting handshake...\n";
+            handshake();
         }
         else
         {
@@ -37,9 +57,26 @@ namespace ClusterController
                 std::cout << "Couldn't connect in time. Make sure batman-adv is properly configured "
                                 "and the device is connected to the mesh: ";
             std::cout << error.message() << std::endl;
-            m_socket.close();
+            //m_socket.close();
             startConnection();
         }
+    }
+
+    void LocalClient::handshake()
+    {
+        m_socket.async_handshake(boost::asio::ssl::stream_base::client,
+            [this](const boost::system::error_code& error)
+            {
+            if (!error)
+            {
+                std::cout << "Handshake succeeded. Sending message...\n";
+                writeMessage();
+            }
+            else
+            {
+                std::cout << "Handshake failed: " << error.message() << "\n";
+            }
+            });
     }
 
     void LocalClient::writeMessage()
@@ -62,7 +99,7 @@ namespace ClusterController
         }
 
         //close the socket after every message sent
-        m_socket.close();
+        //m_socket.close();
         startConnection();
     }
 
