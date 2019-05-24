@@ -5,8 +5,8 @@
 namespace ClusterController
 {
 
-    TcpServer::TcpServer(boost::asio::io_service &io_service, int serverPort) : 
-                        serverAcceptor(io_service, tcp::endpoint(tcp::v4(), COMMUNICATION_PORT)),
+    TcpServer::TcpServer(boost::asio::io_service &io_service) : 
+                        mServerAcceptor(io_service, tcp::endpoint(tcp::v4(), COMMUNICATION_PORT)),
                         mContext(boost::asio::ssl::context::sslv23)
     {
         mContext.set_options(
@@ -27,14 +27,15 @@ namespace ClusterController
 
     void TcpServer::startAccept()
     {
-        TcpConnection::td_tcpConnPointer newConn = TcpConnection::create(serverAcceptor.get_io_service(), mContext);
+        SSLServerConnection::td_tcpConnPointer newConn = SSLServerConnection::create(mServerAcceptor.get_io_service(), 
+                                                                                     mContext);
 
-        serverAcceptor.async_accept(newConn->getSocket().lowest_layer(),
+        mServerAcceptor.async_accept(newConn->getSocket().lowest_layer(),
                                     boost::bind(&TcpServer::onAccept, this, newConn,
                                                 boost::asio::placeholders::error));
     }
 
-    void TcpServer::onAccept(TcpConnection::td_tcpConnPointer newConn, const boost::system::error_code &error)
+    void TcpServer::onAccept(SSLServerConnection::td_tcpConnPointer newConn, const boost::system::error_code &error)
     {
         if (!error)
         {
@@ -47,7 +48,7 @@ namespace ClusterController
     std::string TcpServer::getIpAddress()
     {
         boost::system::error_code error;
-        boost::asio::ip::tcp::endpoint endpoint = serverAcceptor.local_endpoint(error);
+        boost::asio::ip::tcp::endpoint endpoint = mServerAcceptor.local_endpoint(error);
         if (error)
         {
             // An error occurred.
