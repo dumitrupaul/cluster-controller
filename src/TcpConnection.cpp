@@ -75,8 +75,14 @@ namespace ClusterController
             CLUSTER_LOG(error) << error.message();
         }
         auto self(shared_from_this());
-        m_socket.async_shutdown([this, self](...){
+        m_socket.async_shutdown([this, self](const boost::system::error_code& error){
+            // if(error == boost::asio::error::eof)
+            //     CLUSTER_LOG(info) << "EOF";
+            // CLUSTER_LOG(info) << "Server connection shutdown";
             m_socket.lowest_layer().close();
+
+            // https://stackoverflow.com/questions/50693708/boost-asio-ssl-not-able-to-receive-data-for-2nd-time-onwards-1st-time-ok
+            SSL_clear(m_socket.native_handle());
         });
         
     }

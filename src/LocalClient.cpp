@@ -7,6 +7,7 @@
 
 namespace ClusterController
 {
+    const char LocalClient::closeBuffer[1] = "";
 
     LocalClient::LocalClient(boost::asio::io_service &io_service, boost::asio::ssl::context& context) : 
                             m_serverPort(COMMUNICATION_PORT),
@@ -50,7 +51,7 @@ namespace ClusterController
         {
             //connection succeeded
             std::cout << "Connection from the client succeeded. Starting handshake...\n";
-            handshake();
+            doHandshake();
         }
         else
         {
@@ -60,15 +61,11 @@ namespace ClusterController
                                 "and the device is connected to the mesh: ";
             std::cout << error.message() << std::endl;
 
-            m_socket.lowest_layer().close();
-            // m_socket.async_shutdown([this](...){
-            //     m_socket.lowest_layer().close();
-            // });
-            startConnection();
+            shutdownConnection();
         }
     }
 
-    void LocalClient::handshake()
+    void LocalClient::doHandshake()
     {
         m_socket.async_handshake(boost::asio::ssl::stream_base::client,
             [this](const boost::system::error_code& error)
@@ -81,6 +78,7 @@ namespace ClusterController
                 else
                 {
                     std::cout << "Handshake failed: " << error.message() << "\n";
+                    shutdownConnection();
                 }
             });
     }
@@ -105,11 +103,42 @@ namespace ClusterController
         }
 
         //close the socket after every message sent
-        m_socket.lowest_layer().close();
-        // m_socket.async_shutdown([this](...){
-        //     m_socket.lowest_layer().close();
+        shutdownConnection();
+        
+    }
+
+    void LocalClient::shutdownConnection()
+    {
+        // m_socket.async_shutdown([this](...)
+        // {
+        //     std::cout << "CRAPAT";
+        //     boost::asio::async_write(m_socket, boost::asio::buffer(closeBuffer, 1), 
+        //                             [this](const boost::system::error_code& error,
+        //                                     size_t bytes_transferred)
+        //     {
+        //         std::cout << "CRAPAT";
+        //         if ((error.category() == boost::asio::error::get_ssl_category())
+        //             && (SSL_R_PROTOCOL_IS_SHUTDOWN == ERR_GET_REASON(error.value())))
+        //         {
+        //             std::cout << "CRAPAT";
+        //             m_socket.lowest_layer().close();
+        //             SSL_clear(m_socket.native_handle());
+        //             startConnection();
+        //         }
+        //         std::cout << "CRAPAT";
+        //     });
         // });
-        startConnection();
+        m_socket.async_shutdown([this](const boost::system::error_code& error)
+        {
+            
+            m_socket.lowest_layer().close();
+            
+            //https://stackoverflow.com/questions/50693708/boost-asio-ssl-not-able-to-receive-data-for-2nd-time-onwards-1st-time-ok
+            SSL_clear(m_socket.native_handle());
+
+            startConnection();
+        });
+        
     }
 
     void LocalClient::handleInput()

@@ -41,8 +41,6 @@ namespace ClusterController
             newConn->startHandshake();
         }
         
-        //newConn->getSocket().lowest_layer().close();
-        
         startAccept();
     }
 

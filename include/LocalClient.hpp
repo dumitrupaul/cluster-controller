@@ -20,7 +20,9 @@ namespace ClusterController
 
         void onConnect(const boost::system::error_code &error);
 
-        void handshake();
+        void doHandshake();
+
+        void shutdownConnection();
 
         void writeMessage();
 
@@ -29,6 +31,7 @@ namespace ClusterController
         void onWrite(const boost::system::error_code &error, size_t bytes_transferred);
         
         int m_serverPort;
+        static const char closeBuffer[1];
         boost::asio::ssl::stream<tcp::socket> m_socket;
         boost::asio::streambuf m_txBuffer;
         boost::asio::ip::address m_ipAddress;
