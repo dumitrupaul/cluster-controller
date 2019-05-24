@@ -1,6 +1,6 @@
 #include "ClusterIncludes.hpp"
 #include "TcpServer.hpp"
-#include "LocalClient.hpp"
+#include "LocalSSLClient.hpp"
 #include "DeviceManager.hpp"
 #include <thread>
 #include <boost/log/utility/setup.hpp>
@@ -45,7 +45,10 @@ void handleClient()
   {
     boost::asio::io_service io_service;
 
-    ClusterController::LocalClient client(io_service, COMMUNICATION_PORT);
+    boost::asio::ssl::context ctx(boost::asio::ssl::context::sslv23);
+    ctx.load_verify_file("rootca.crt");
+
+    ClusterController::LocalSSLClient client(io_service, ctx);
 
     io_service.run();
   }
@@ -61,7 +64,7 @@ void handleServer()
   {
     boost::asio::io_service io_service;
 
-    ClusterController::TcpServer server(io_service, COMMUNICATION_PORT);
+    ClusterController::TcpServer server(io_service);
 
     io_service.run();
   }

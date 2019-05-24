@@ -1,7 +1,8 @@
 #ifndef TCPSERVER_HPP
 #define TCPSERVER_HPP
 #include "ClusterIncludes.hpp"
-#include "TcpConnection.hpp"
+#include "SSLServerConnection.hpp"
+#include <boost/asio/ssl.hpp>
 
 namespace ClusterController
 {
@@ -10,16 +11,21 @@ namespace ClusterController
     class TcpServer
     {
     public:
-        TcpServer(boost::asio::io_service &io_service, int serverPort);
+        TcpServer(boost::asio::io_service &io_service);
+
+        ~TcpServer() = default;
 
     private:
         void startAccept();
 
         std::string getIpAddress(); // not functional
 
-        void onAccept(TcpConnection::td_tcpConnPointer newConn, const boost::system::error_code &error);
+        std::string getPassword() const;
 
-        tcp::acceptor serverAcceptor;
+        void onAccept(SSLServerConnection::td_tcpConnPointer newConn, const boost::system::error_code &error);
+
+        tcp::acceptor mServerAcceptor;
+        boost::asio::ssl::context mContext;
     };
 }
 #endif //TCPSERVER_HPP
