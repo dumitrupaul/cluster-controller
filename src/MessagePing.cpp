@@ -53,7 +53,7 @@ namespace ClusterController
         return true;
     }
 
-    MessageType MessagePing::getMessageType()
+    MessageType MessagePing::getMessageType() const
     {
         return m_header.getMessageType();
     }
