@@ -6,12 +6,14 @@ The goal of this project is to provide a meaningful demo into how a high-level p
 
 ### About the project
 
-In summary this is an IoT descentralized approach to a network of high-powered devices (Raspberry PIs in this case) bringing anonymity to the IoT world. It makes use of the B.A.T.M.A.N. project in creating the mesh using a kernel module operating on layer 2, more details [here](https://www.open-mesh.org/projects/batman-adv/wiki/Wiki). The application is esentially a demo protocol which uses the created mesh for message passing, the structure of the messages can be found in the documentation section.
+In summary this is an IoT decentralized approach to a network of high-powered devices (Raspberry PIs in this case) bringing anonymity to the IoT world. It makes use of the B.A.T.M.A.N. project in creating the mesh using a kernel module operating on layer 2, more details [here](https://www.open-mesh.org/projects/batman-adv/wiki/Wiki). The application is essentially a demo protocol which uses the created mesh for message passing.
 
 ![Currently tested POC with 2 RPi nodes and 1 PC machine](./docs/arh_apl_eng.png)
 
+![Demo](./docs/demo.gif)
+
 ## Dependencies
-The project has two main branches: `master` for compilling under generic linux environment and `raspberry-pi` for compiling under Raspbian environment using the WiringPI library.
+The project has two main branches: `master` for compiling under generic Linux environment and `raspberry-pi` for compiling under Raspbian environment using the WiringPI library.
 Since the setup switches the WiFi mode to ad-hoc a separated/unused WiFi interface should be used.
 
 ```
